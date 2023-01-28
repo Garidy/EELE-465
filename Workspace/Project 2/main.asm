@@ -4,6 +4,8 @@
 ; Jan 26, 2023
 ; Read and Write to an RTC using I2C.
 ;
+;		R4: outer delay loop counter (set before call to delay)
+;		R5: inner delay loop counter (set inside "Delay" subroutine)
 ;
 ;-------------------------------------------------------------------------------
             .cdecls C,LIST,"msp430.h"       ; Include device header file
@@ -29,42 +31,81 @@ StopWDT     mov.w   #WDTPW|WDTHOLD,&WDTCTL  ; Stop watchdog timer
 ;-------------------------------------------------------------------------------
 init:
 		bis.b	#BIT2, &P3DIR				;Set P3.2 as an output (SCL)
-		bic.b	#BIT2, &P3OUT				;Initialize SCL low
+		bis.b	#BIT2, &P3OUT				;Initialize SCL HIGH
 
 		bis.b	#BIT0, &P3DIR				;Set P3.3 as an output (SDA)
-		bic.b	#BIT0, &P3DIR				;Initialize SDA low
+		bis.b	#BIT0, &P3OUT				;Initialize SDA HIGH
 
 		bic.b	#LOCKLPM5, &PM5CTL0			;Turn on digital I/O
 
 
 main:
-		bis.b	#BIT0, &P3DIR				; Toggle P3.0 (LED)
-		mov.w	#0FFFFh, R4					; Set Outer Delay Loop
+		call 	#I2Cstart
 
-		call	#Delay						; call Delay subroutine
+		mov.b	#011010000b, TransmitByte	;Set TransmitByte to slave address (1101000) and R/W bit (0:W 1:R)
 
-		bic.b	#BIT0, &P3DIR				; Toggle P3.0 (LED)
+		call	#I2Csend
 
-		mov.w	#0FFFFh, R4					; Set Outer Delay Loop
+		;mov.w	#0FFFFh, R4					; Set Outer Delay Loop
 
-		call	#Delay						; call Delay subroutine
+		;call	#Delay						; call Delay subroutine
+
+		jmp		main						; loop main
 ;-------------------------------------------------------------------------------
 ; Delay start
 ;-------------------------------------------------------------------------------
 Delay:
-		mov.w	#04h, R5		; Set Inner Delay Loop
+		mov.w	#04h, R5					; Set Inner Delay Loop
 
 For:
-		dec		R5				; decrement inner Delay loop
-		jnz		For				; loop through for loop
+		dec		R5							; decrement inner Delay loop
+		jnz		For							; loop through for loop
 EndFor:
 
-		dec		R4				; decrement outer Delay loop
-		jnz		Delay			; jump to the beginning of Delay subroutine
+		dec		R4							; decrement outer Delay loop
+		jnz		Delay						; jump to the beginning of Delay subroutine
 
-		ret						; return to main
+		ret									; return to main
 ;--------------------------------- END Delay -----------------------------------
 
+;-------------------------------------------------------------------------------
+; I2Cstart
+;-------------------------------------------------------------------------------
+I2Cstart:
+		bis.b	#BIT0, &P3OUT				; Force SDA HIGH
+		bis.b	#BIT2, &P3OUT				; Force SCL HIGH
+
+		bic.b	#BIT0, &P3OUT				; SDA pulled to a logic low
+
+		;call	#shortDelay
+
+		bic.b	#BIT2, &P3OUT				; SCL pulled to a logic low
+		ret									;return to main
+;--------------------------------- END I2Cstart -----------------------------------
+
+;-------------------------------------------------------------------------------
+; I2Csend
+;-------------------------------------------------------------------------------
+I2Csend:
+
+
+		ret									;return to main
+;--------------------------------- END I2Csend -----------------------------------
+
+
+;-------------------------------------------------------------------------------
+; Memory Allocation
+;-------------------------------------------------------------------------------
+
+		.data								; go to data memory
+		.retain								; keep this section
+
+SlaveAddress:	.short	001101000b
+
+TransmitByte:	.space	2
+
+
+;-------------------------------------------------------------------------------
 
 
 ;-------------------------------------------------------------------------------
