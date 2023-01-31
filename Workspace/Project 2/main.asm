@@ -42,7 +42,6 @@ init:
 
 main:
 		call 	#I2Cstart
-		mov.w	#08h, R6
 		mov.w	#02h, R4
 
 		mov.b	#011010000b, TransmitByte	;Set TransmitByte to slave address (1101000) and R/W bit (0:W 1:R)
@@ -110,11 +109,22 @@ I2Cstart:
 ; I2Csend
 ;-------------------------------------------------------------------------------
 I2Csend:
-
+		mov.w	#08h, R6
 		call	#I2CtxByte					; calls I2CtxByte
-
 		call 	#I2CackRequest				; calls I2CackRequest
 
+		mov.b 	#00h, DataOut				; initialize 00h into DataOut
+
+DataCount:
+		mov.b 	DataOut, TransmitByte
+		mov.w	#08h, R6
+		call	#I2CtxByte					; calls I2CtxByte
+		call 	#I2CackRequest				; calls I2CackRequest
+
+		inc.b 	DataOut						; increment DataOut
+		cmp.b	#00001010b, DataOut
+		jnz		DataCount					; if DataOut != 10, loop counter
+EndDataCount:
 		ret									;return to main
 ;--------------------------------- END I2Csend -----------------------------------
 
@@ -179,6 +189,8 @@ I2CackRequest:
 SlaveAddress:	.short	001101000b
 
 TransmitByte:	.space	2
+
+DataOut:		.space  2
 
 
 ;-------------------------------------------------------------------------------
