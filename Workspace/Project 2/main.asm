@@ -4,9 +4,22 @@
 ; Jan 26, 2023
 ; Read and Write to an RTC using I2C.
 ;
+;	Registers
 ;		R4: outer delay loop counter (set before call to delay)
 ;		R5: inner delay loop counter (set inside "Delay" subroutine)
 ;		R6: TransmitByte counter
+;
+;	Variables
+;		TransmitByte: Data being transmited out on SDA
+;		DataOut: Data to be shifted into TransmitByte
+;
+;	Sub Routines
+;		Short Delay: Delay for a few clock cycles
+;		Long Delay:	Delay for next 15kHz clock
+;		I2Cstart: Send I2C start condition (SDA pulled low, short delay, SCL pulled low)
+;		I2Csend: Load Transmit Byte with data to be sent and acknowledge request
+;		I2CtxByte: Load Transmit Byte and shift to MSB, send out bit by bit
+;		I2CackRequest: Put SDA into input and wait for acknowledge bit from slave
 ;
 ;-------------------------------------------------------------------------------
             .cdecls C,LIST,"msp430.h"       ; Include device header file
