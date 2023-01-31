@@ -6,6 +6,7 @@
 ;
 ;		R4: outer delay loop counter (set before call to delay)
 ;		R5: inner delay loop counter (set inside "Delay" subroutine)
+;		R6: TransmitByte counter
 ;
 ;-------------------------------------------------------------------------------
             .cdecls C,LIST,"msp430.h"       ; Include device header file
@@ -41,6 +42,7 @@ init:
 
 main:
 		call 	#I2Cstart
+		mov.w	#08h, R6
 
 		mov.b	#011010000b, TransmitByte	;Set TransmitByte to slave address (1101000) and R/W bit (0:W 1:R)
 
@@ -49,30 +51,54 @@ main:
 		;mov.w	#0FFFFh, R4					; Set Outer Delay Loop
 
 		;call	#Delay						; call Delay subroutine
+		bis.b	#BIT2, &P3OUT				; SCL pulled to a logic high
+		mov.w   #02h, R4
+		call	#LongDelay
+		mov.w   #02h, R4
+		call	#LongDelay
+		mov.w   #02h, R4
+		call	#LongDelay
 
 		jmp		main						; loop main
 ;-------------------------------------------------------------------------------
-; Delay start
+; Short Delay
 ;-------------------------------------------------------------------------------
-Delay:
-		mov.w	#04h, R5					; Set Inner Delay Loop
+ShortDelay:
+		mov.w	#01h, R5					; Set Inner Delay Loop
 
-For:
+ShortFor:
 		dec		R5							; decrement inner Delay loop
-		jnz		For							; loop through for loop
-EndFor:
+		jnz		ShortFor							; loop through for loop
+EndShortFor:
 
 		dec		R4							; decrement outer Delay loop
-		jnz		Delay						; jump to the beginning of Delay subroutine
+		jnz		ShortDelay						; jump to the beginning of Delay subroutine
 
-		ret									; return to main
-;--------------------------------- END Delay -----------------------------------
+		ret									; return
+;--------------------------------- END Short Delay -----------------------------------
+
+;-------------------------------------------------------------------------------
+; Long Delay
+;-------------------------------------------------------------------------------
+LongDelay:
+		mov.w	#09h, R5					; Set Inner Delay Loop
+
+LongFor:
+		dec		R5							; decrement inner Delay loop
+		jnz		LongFor							; loop through for loop
+EndLongFor:
+
+		dec		R4							; decrement outer Delay loop
+		jnz		LongDelay						; jump to the beginning of Delay subroutine
+
+		ret									; return
+;--------------------------------- END Short Delay -----------------------------------
 
 ;-------------------------------------------------------------------------------
 ; I2Cstart
 ;-------------------------------------------------------------------------------
 I2Cstart:
-		bis.b	#BIT0, &P3OUT				; Force SDA HIGH
+;		bis.b	#BIT0, &P3OUT				; Force SDA HIGH
 		bis.b	#BIT2, &P3OUT				; Force SCL HIGH
 
 		bic.b	#BIT0, &P3OUT				; SDA pulled to a logic low
@@ -88,10 +114,43 @@ I2Cstart:
 ;-------------------------------------------------------------------------------
 I2Csend:
 
+		call	#I2CtxByte					; calls I2CtxByte
 
 		ret									;return to main
 ;--------------------------------- END I2Csend -----------------------------------
 
+;-------------------------------------------------------------------------------
+; I2CtxByte
+;-------------------------------------------------------------------------------
+I2CtxByte:
+
+		bit.w 	#010000000b, TransmitByte	;test if MSB of TransmitByte = 1
+		jnz		TransmitByte1
+
+TransmitByte0:
+		bic.b	#BIT0, &P3OUT				; SDA pulled to a logic low
+		jmp		TransmitByteEnd
+
+TransmitByte1:
+		bis.b	#BIT0, &P3OUT				; SDA pulled to a logic high
+		jmp		TransmitByteEnd
+
+TransmitByteEnd:
+
+		mov.w   #02h, R4
+		call	#ShortDelay
+		bis.b 	#BIT2, &P3OUT				; SCL pulled to a logic high
+		mov.w   #02h, R4
+		call	#LongDelay
+		bic.b 	#BIT2, &P3OUT				; SCL pulled to a logic low
+
+		rla.b	TransmitByte	; set next bit to MSB
+		dec.w	R6				; decrement TransmitByte Counter
+		cmp.w	#00h, R6		; check if R6 is 0
+		jnz		I2CtxByte		; loop until R6 = 0
+
+		ret									;return to main
+;--------------------------------- END I2CtxByte -----------------------------------
 
 ;-------------------------------------------------------------------------------
 ; Memory Allocation
