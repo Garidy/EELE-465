@@ -43,6 +43,7 @@ init:
 main:
 		call 	#I2Cstart
 		mov.w	#08h, R6
+		mov.w	#02h, R4
 
 		mov.b	#011010000b, TransmitByte	;Set TransmitByte to slave address (1101000) and R/W bit (0:W 1:R)
 
@@ -52,12 +53,7 @@ main:
 
 		;call	#Delay						; call Delay subroutine
 		bis.b	#BIT2, &P3OUT				; SCL pulled to a logic high
-		mov.w   #02h, R4
-		call	#LongDelay
-		mov.w   #02h, R4
-		call	#LongDelay
-		mov.w   #02h, R4
-		call	#LongDelay
+		bis.b	#BIT0, &P3OUT				; SDA pulled to a logic high
 
 		jmp		main						; loop main
 ;-------------------------------------------------------------------------------
@@ -84,11 +80,11 @@ LongDelay:
 		mov.w	#09h, R5					; Set Inner Delay Loop
 
 LongFor:
-		dec		R5							; decrement inner Delay loop
+		dec		R5								; decrement inner Delay loop
 		jnz		LongFor							; loop through for loop
 EndLongFor:
 
-		dec		R4							; decrement outer Delay loop
+		dec		R4								; decrement outer Delay loop
 		jnz		LongDelay						; jump to the beginning of Delay subroutine
 
 		ret									; return
@@ -103,7 +99,8 @@ I2Cstart:
 
 		bic.b	#BIT0, &P3OUT				; SDA pulled to a logic low
 
-		;call	#shortDelay
+		mov.w   #02h, R4
+		call	#ShortDelay
 
 		bic.b	#BIT2, &P3OUT				; SCL pulled to a logic low
 		ret									;return to main
@@ -115,6 +112,8 @@ I2Cstart:
 I2Csend:
 
 		call	#I2CtxByte					; calls I2CtxByte
+
+		call 	#I2CackRequest				; calls I2CackRequest
 
 		ret									;return to main
 ;--------------------------------- END I2Csend -----------------------------------
@@ -149,8 +148,26 @@ TransmitByteEnd:
 		cmp.w	#00h, R6		; check if R6 is 0
 		jnz		I2CtxByte		; loop until R6 = 0
 
-		ret									;return to main
+		ret									;return to I2Csend
 ;--------------------------------- END I2CtxByte -----------------------------------
+
+;-------------------------------------------------------------------------------
+; I2CackRequest
+;-------------------------------------------------------------------------------
+I2CackRequest:
+
+		bic.b	#BIT0, &P3OUT				; SDA pulled to a logic low !!!DELETE THIS LATER!!!
+
+		mov.w   #02h, R4
+		call	#ShortDelay
+		bis.b 	#BIT2, &P3OUT				; SCL pulled to a logic high
+		mov.w   #02h, R4
+		call	#LongDelay
+		bic.b 	#BIT2, &P3OUT				; SCL pulled to a logic low
+
+		ret									;return to I2Csend
+;--------------------------------- END I2Csend -----------------------------------
+
 
 ;-------------------------------------------------------------------------------
 ; Memory Allocation
