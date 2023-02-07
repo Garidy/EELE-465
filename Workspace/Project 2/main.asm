@@ -68,7 +68,7 @@ main:
 		;call	#Delay						; call Delay subroutine
 		bis.b	#BIT2, &P3OUT				; SCL pulled to a logic high
 		mov.w   #01h, R4
-		call	#ShortDelay
+		call	#LongDelay
 		bis.b	#BIT0, &P3OUT				; SDA pulled to a logic high
 
 		jmp		main						; loop main
@@ -76,7 +76,7 @@ main:
 ; Short Delay
 ;-------------------------------------------------------------------------------
 ShortDelay:
-		mov.w	#02h, R5					; Set Inner Delay Loop
+		mov.w	#04h, R5					; Set Inner Delay Loop
 
 ShortFor:
 		dec		R5							; decrement inner Delay loop
@@ -146,12 +146,49 @@ I2Csend:
 		call	#I2CtxByte					; calls I2CtxByte
 		call 	#I2CackRequest				; calls I2CackRequest
 
-		mov.w	#07h, R6					; sets RxCounter to 8
+		mov.w	#08h, R6					; sets RxCounter to 8
 		call	#I2CrxByte					; calls I2CrxByte
-		mov.w	#07h, R6					; sets RxCounter to 8
+		call	#I2CsendAck
+		mov.w	#08h, R6					; sets RxCounter to 8
 		call	#I2CrxByte					; calls I2CrxByte
-		mov.w	#07h, R6					; sets RxCounter to 8
+		call	#I2CsendAck
+		mov.w	#08h, R6					; sets RxCounter to 8
 		call	#I2CrxByte					; calls I2CrxByte
+		call	#I2CsendNak
+
+		bis.b	#BIT2, &P3OUT				; SCL pulled to a logic high
+		mov.w   #01h, R4
+		call	#LongDelay
+		bis.b	#BIT0, &P3OUT				; SDA pulled to a logic high
+
+
+		call 	#I2Cstart
+		mov.w	#01h, R4
+
+
+		mov.b	#011010000b, TransmitByte	;Set TransmitByte to slave address (1101000) and R/W bit (0:W 1:R)
+		mov.w	#08h, R6					; sets TxCounter to 8
+		call	#I2CtxByte					; calls I2CtxByte
+		call 	#I2CackRequest				; calls I2CackRequest
+
+		mov.w	#08h, R6					; sets TxCounter to 8
+		mov.w	#11h, TransmitByte			; write to RTC temp register
+		call	#I2CtxByte					; calls I2CtxByte
+		call 	#I2CackRequest				; calls I2CackRequest
+
+		call 	#I2Cstart
+
+		mov.b	#011010001b, TransmitByte	;Set TransmitByte to slave address (1101000) and R/W bit (0:W 1:R)
+		mov.w	#08h, R6					; sets TxCounter to 8
+		call	#I2CtxByte					; calls I2CtxByte
+		call 	#I2CackRequest				; calls I2CackRequest
+
+		mov.w	#08h, R6					; sets RxCounter to 8
+		call	#I2CrxByte					; calls I2CrxByte
+		call	#I2CsendAck
+		mov.w	#08h, R6					; sets RxCounter to 8
+		call	#I2CrxByte					; calls I2CrxByte
+		call	#I2CsendNak
 
 		ret									; return to main
 
@@ -190,10 +227,10 @@ TransmitByte1:
 TransmitByteEnd:
 
 		mov.w   #01h, R4
-		call	#ShortDelay
+;		call	#ShortDelay
 		bis.b 	#BIT2, &P3OUT				; SCL pulled to a logic high
 		mov.w   #01h, R4
-		call	#LongDelay
+		call	#ShortDelay
 		bic.b 	#BIT2, &P3OUT				; SCL pulled to a logic low
 
 		rla.b	TransmitByte	; set next bit to MSB
@@ -213,7 +250,7 @@ I2CrxByte:
 		bis.b	#BIT0, &P3OUT				; use pull up resistor
 
 		mov.w   #01h, R4
-		call	#ShortDelay
+;		call	#ShortDelay
 		bis.b 	#BIT2, &P3OUT				; SCL pulled to a logic high
 
 		bit.b	#00000001, &P3IN			; look at P3.0
@@ -231,7 +268,7 @@ ReadByteEnd:
 
 
 		mov.w   #01h, R4
-		call	#LongDelay
+;		call	#ShortDelay
 		bic.b 	#BIT2, &P3OUT				; SCL pulled to a logic low
 
 		rla.b	ReadByte					; set next bit to MSB
@@ -239,22 +276,50 @@ ReadByteEnd:
 		cmp.w	#00h, R6					; check if R6 is 0
 		jnz		I2CrxByte					; loop until R6 = 0
 
+		ret									;return to I2Csend
+
+;--------------------------------- END I2CrxByte -----------------------------------
+
+;-------------------------------------------------------------------------------
+; I2CsendAck
+;-------------------------------------------------------------------------------
+I2CsendAck:
+
 		bis.b	#BIT0, &P3DIR				; Set P3.0 as an output (SDA)
 ;		bic.b	#BIT0, &P3REN				; Disable Resistors
-
 		; send ack
 		bic.b	#BIT0, &P3OUT				; SDA pulled to a logic low
 		mov.w   #01h, R4
 		call	#ShortDelay
-;		bis.b 	#BIT2, &P3OUT				; SCL pulled to a logic high
-;		mov.w   #01h, R4
-;		call	#LongDelay
-;		bic.b 	#BIT2, &P3OUT				; SCL pulled to a logic low
+		bis.b 	#BIT2, &P3OUT				; SCL pulled to a logic high
+		mov.w   #01h, R4
+		call	#LongDelay
+		bic.b 	#BIT2, &P3OUT				; SCL pulled to a logic low
 
 
 
 		ret									;return to I2Csend
-;--------------------------------- END I2CrxByte -----------------------------------
+;--------------------------------- END I2CsendAck -----------------------------------
+;-------------------------------------------------------------------------------
+; I2CsendNak
+;-------------------------------------------------------------------------------
+I2CsendNak:
+
+		bis.b	#BIT0, &P3DIR				; Set P3.0 as an output (SDA)
+;		bic.b	#BIT0, &P3REN				; Disable Resistors
+		; send ack
+		bis.b	#BIT0, &P3OUT				; SDA pulled to a logic high
+		mov.w   #01h, R4
+		call	#ShortDelay
+		bis.b 	#BIT2, &P3OUT				; SCL pulled to a logic high
+		mov.w   #01h, R4
+		call	#LongDelay
+		bic.b 	#BIT2, &P3OUT				; SCL pulled to a logic low
+
+
+
+		ret									;return to I2Csend
+;--------------------------------- END I2CsendAck -----------------------------------
 ;-------------------------------------------------------------------------------
 ; I2CackRequest
 ;-------------------------------------------------------------------------------
@@ -267,15 +332,16 @@ I2CackRequest:
 		bis.b	#BIT0, &P3OUT				; use pull up resistor
 
 		mov.w   #01h, R4
-		call	#ShortDelay
+		call	#LongDelay
 		bis.b 	#BIT2, &P3OUT				; SCL pulled to a logic high
 		mov.w   #01h, R4
-		call	#LongDelay
+		call	#ShortDelay
 		bic.b 	#BIT2, &P3OUT				; SCL pulled to a logic low
 
-		bit.b	#00000001, &P3IN			; look at P3.0
+;		bit.b	#00000001b, &P3IN			; look at P3.0
+;		mov.b	&P3IN, R7
 
-		jz		I2CackRequest
+;		jz		I2CackRequest
 
 ;		mov.w   #02h, R4
 ;		call	#ShortDelay
