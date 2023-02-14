@@ -154,18 +154,22 @@ CheckKeypad:
 		ret
 
 D1Set:
+		bic.b	#00001111b, R6
 		bis.b	#0001b, R6
 		jmp		CheckRows
 
 D2Set:
+		bic.b	#00001111b, R6
 		bis.b	#0010b, R6
 		jmp		CheckRows
 
 D3Set:
+		bic.b	#00001111b, R6
 		bis.b	#0100b, R6
 		jmp		CheckRows
 
 D4Set:
+		bic.b	#00001111b, R6
 		bis.b	#1000b, R6
 		jmp		CheckRows
 
@@ -212,18 +216,22 @@ CheckRows:
 
 		ret
 D5Set:
+		bic.b	#11110000b, R6
 		bis.b	#00010000b, R6
 		ret
 
 D6Set:
+		bic.b	#11110000b, R6
 		bis.b	#00100000b, R6
 		ret
 
 D7Set:
+		bic.b	#11110000b, R6
 		bis.b	#01000000b, R6
 		ret
 
 D8Set:
+		bic.b	#11110000b, R6
 		bis.b	#10000000b, R6
 		ret
 
