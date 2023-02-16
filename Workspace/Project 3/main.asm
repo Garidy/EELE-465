@@ -348,10 +348,33 @@ SetPattern3:
 ; Interrupt Service Routines
 ;-------------------------------------------------------------------------------
 TimerB1_Switch:
-		xor.b	#BIT6, &P6OUT		; switch LED
+		cmp.b		#00h, Setpattern
+		jz			Pattern0
+
+		cmp.b		#01h, Setpattern
+		jz			Pattern1
+
+		cmp.b		#02h, Setpattern
+		jz			Pattern2
+
+		cmp.b		#03h, Setpattern
+		jz			Pattern3
+
+Pattern0:
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
+Pattern1:
 
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
+Pattern2:
+
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
+Pattern3:
+
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
 
 
 ;--------- END TB1 ISRs --------------------------------------------------------
