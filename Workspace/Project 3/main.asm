@@ -142,6 +142,9 @@ init:
 
 
 main:
+		mov.w	SetPattern, R7
+		mov.w	Output, R8
+		mov.w	Rx, R6
 
 		call 	#CheckKeypad
 		call	#CheckPattern
@@ -212,23 +215,23 @@ CheckKeypad:
 		ret
 
 D1Set:
-		bic.b	#00001111b, R6
-		bis.b	#0001b, R6
+		bic.b	#00001111b, Rx
+		bis.b	#0001b, Rx
 		jmp		CheckRows
 
 D2Set:
-		bic.b	#00001111b, R6
-		bis.b	#0010b, R6
+		bic.b	#00001111b, Rx
+		bis.b	#0010b, Rx
 		jmp		CheckRows
 
 D3Set:
-		bic.b	#00001111b, R6
-		bis.b	#0100b, R6
+		bic.b	#00001111b, Rx
+		bis.b	#0100b, Rx
 		jmp		CheckRows
 
 D4Set:
-		bic.b	#00001111b, R6
-		bis.b	#1000b, R6
+		bic.b	#00001111b, Rx
+		bis.b	#1000b, Rx
 		jmp		CheckRows
 
 CheckRows:
@@ -274,23 +277,23 @@ CheckRows:
 
 		ret
 D5Set:
-		bic.b	#11110000b, R6
-		bis.b	#00010000b, R6
+		bic.b	#11110000b, Rx
+		bis.b	#00010000b, Rx
 		ret
 
 D6Set:
-		bic.b	#11110000b, R6
-		bis.b	#00100000b, R6
+		bic.b	#11110000b, Rx
+		bis.b	#00100000b, Rx
 		ret
 
 D7Set:
-		bic.b	#11110000b, R6
-		bis.b	#01000000b, R6
+		bic.b	#11110000b, Rx
+		bis.b	#01000000b, Rx
 		ret
 
 D8Set:
-		bic.b	#11110000b, R6
-		bis.b	#10000000b, R6
+		bic.b	#11110000b, Rx
+		bis.b	#10000000b, Rx
 		ret
 
 
@@ -301,12 +304,43 @@ D8Set:
 ;-------------------------------------------------------------------------------
 
 CheckPattern:
-
-
 ;if code = 81 => pattern 1
 ;if code = 41 => pattern 2
 ;if code = 21 => pattern 3
 ;if code = 11 => pattern 4
+
+		cmp.b	#81h, Rx
+		jz		SetPattern0
+		cmp.b	#41h, Rx
+		jz		SetPattern1
+		cmp.b	#21h, Rx
+		jz		SetPattern2
+		cmp.b	#11h, Rx
+		jz		SetPattern3
+
+
+		ret
+
+SetPattern0:
+		mov.w	#00000000b, SetPattern
+		mov.w	#10101010b, Output
+		ret
+
+SetPattern1:
+		mov.w	#00000001b, SetPattern
+		mov.w	#00000000b, Output
+		ret
+
+SetPattern2:
+		mov.w	#00000010b, SetPattern
+		mov.w	#01111111b, Output
+		ret
+
+SetPattern3:
+		mov.w	#00000011b, SetPattern
+		mov.w	#00011000b, Output
+		ret
+
 
 ;--------------------------------- END Check Keypad -----------------------------------
 
@@ -326,12 +360,14 @@ TimerB1_Switch:
 ; Memory Allocation
 ;-------------------------------------------------------------------------------
 
-		.data								; go to data memory
-		.retain								; keep this section
+			.data								; go to data memory
+			.retain								; keep this section
 
-Rx:		.space	2
+Rx:			.space	2
 
 SetPattern:	.space 	2
+
+Output:		.space	2
 
 
 ;-------------------------------------------------------------------------------
