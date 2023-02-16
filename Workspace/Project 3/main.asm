@@ -78,6 +78,47 @@ init:
 		bic.b	#BIT5, &P1SEL1				; set as digital I/O port
 		bic.b	#BIT5, &P1DIR				; set P1.5 as an input
 
+		;LEDs
+		bic.b	#BIT0, &P6SEL0
+		bic.b	#BIT0, &P6SEL1				; set as digital I/O port
+		bis.b	#BIT0, &P6DIR				; set P6.0 as an output
+		bis.b	#BIT0, &P6OUT				; init HIGH
+
+		bic.b	#BIT1, &P6SEL0
+		bic.b	#BIT1, &P6SEL1				; set as digital I/O port
+		bis.b	#BIT1, &P6DIR				; set P6.1 as an output
+		bis.b	#BIT1, &P6OUT				; init HIGH
+
+		bic.b	#BIT2, &P6SEL0
+		bic.b	#BIT2, &P6SEL1				; set as digital I/O port
+		bis.b	#BIT2, &P6DIR				; set P6.2 as an output
+		bis.b	#BIT2, &P6OUT				; init HIGH
+
+		bic.b	#BIT3, &P6SEL0
+		bic.b	#BIT3, &P6SEL1				; set as digital I/O port
+		bis.b	#BIT3, &P6DIR				; set P6.3 as an output
+		bis.b	#BIT3, &P6OUT				; init HIGH
+
+		bic.b	#BIT4, &P6SEL0
+		bic.b	#BIT4, &P6SEL1				; set as digital I/O port
+		bis.b	#BIT4, &P6DIR				; set P6.4 as an output
+		bis.b	#BIT4, &P6OUT				; init HIGH
+
+		bic.b	#BIT7, &P3SEL0
+		bic.b	#BIT7, &P3SEL1				; set as digital I/O port
+		bis.b	#BIT7, &P3DIR				; set P3.7 as an output
+		bis.b	#BIT7, &P3OUT				; init HIGH
+
+		bic.b	#BIT4, &P2SEL0
+		bic.b	#BIT4, &P2SEL1				; set as digital I/O port
+		bis.b	#BIT4, &P2DIR				; set P2.4 as an output
+		bis.b	#BIT4, &P2OUT				; init HIGH
+
+		bic.b	#BIT3, &P3SEL0
+		bic.b	#BIT3, &P3SEL1				; set as digital I/O port
+		bis.b	#BIT3, &P3DIR				; set P3.3 as an output
+		bis.b	#BIT3, &P3OUT				; init HIGH
+
 		mov.w	#00000000b, R6				; Rx
 
 
@@ -245,7 +286,9 @@ D8Set:
 		.data								; go to data memory
 		.retain								; keep this section
 
-Rx:	.space	2
+Rx:		.space	2
+
+SetPattern:	.space 	2
 
 
 ;-------------------------------------------------------------------------------
