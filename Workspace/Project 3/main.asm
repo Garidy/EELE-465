@@ -121,6 +121,22 @@ init:
 
 		mov.w	#00000000b, R6				; Rx
 
+;-- Setup Timer B1
+		bis.w	#TBCLR, &TB1CTL
+		bis.w	#TBSSEL__ACLK, &TB1CTL
+		bis.w	#MC__UP, &TB1CTL
+
+
+;-- Setup Compare Registers
+		mov.w	#32849d, &TB1CCR0
+
+		bis.w	#CCIE, &TB1CCTL0	; Setup TB1CCTL0 flags
+		bic.w	#CCIFG, &TB1CCTL0
+
+
+; Enable Global Interrupts
+		bis.b	#GIE, SR
+
 
 		bic.b	#LOCKLPM5, &PM5CTL0			;Turn on digital I/O
 
@@ -128,6 +144,7 @@ init:
 main:
 
 		call 	#CheckKeypad
+		call	#CheckPattern
 
 		jmp		main						; loop main
 
@@ -280,6 +297,32 @@ D8Set:
 		ret									; return
 ;--------------------------------- END Check Keypad -----------------------------------
 ;-------------------------------------------------------------------------------
+; CheckPattern
+;-------------------------------------------------------------------------------
+
+CheckPattern:
+
+
+;if code = 81 => pattern 1
+;if code = 41 => pattern 2
+;if code = 21 => pattern 3
+;if code = 11 => pattern 4
+
+;--------------------------------- END Check Keypad -----------------------------------
+
+;-------------------------------------------------------------------------------
+; Interrupt Service Routines
+;-------------------------------------------------------------------------------
+TimerB1_Switch:
+		xor.b	#BIT6, &P6OUT		; switch LED
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
+
+
+
+;--------- END TB1 ISRs --------------------------------------------------------
+
+;-------------------------------------------------------------------------------
 ; Memory Allocation
 ;-------------------------------------------------------------------------------
 
@@ -303,3 +346,5 @@ SetPattern:	.space 	2
             .sect   ".reset"                ; MSP430 RESET Vector
             .short  RESET
             
+            .sect	".int41"				; TB1CCR0 Vector
+            .short	TimerB1_Switch
