@@ -148,6 +148,7 @@ main:
 
 		call 	#CheckKeypad
 		call	#CheckPattern
+		call	#OutputLED
 
 		jmp		main						; loop main
 
@@ -311,11 +312,11 @@ CheckPattern:
 
 		cmp.b	#81h, Rx
 		jz		SetPattern0
-		cmp.b	#41h, Rx
+		cmp.b	#82h, Rx
 		jz		SetPattern1
-		cmp.b	#21h, Rx
+		cmp.b	#84h, Rx
 		jz		SetPattern2
-		cmp.b	#11h, Rx
+		cmp.b	#88h, Rx
 		jz		SetPattern3
 
 
@@ -343,21 +344,99 @@ SetPattern3:
 
 
 ;--------------------------------- END Check Keypad -----------------------------------
+;-------------------------------------------------------------------------------
+; Output
+;-------------------------------------------------------------------------------
 
+OutputLED:
+		mov.w	Output, R8
+		bit.b	#00000001b, R8
+		jz		LED1off
+		bis.b	#BIT0, &P6OUT				; set HIGH
+		jmp		LED2
+LED1off:
+		bic.b	#BIT0, &P6OUT
+
+LED2:
+		mov.w	Output, R8
+		bit.b	#00000010b, R8
+		jz		LED2off
+		bis.b	#BIT1, &P6OUT				; set HIGH
+		jmp		LED3
+LED2off:
+		bic.b	#BIT1, &P6OUT
+
+LED3:
+		mov.w	Output, R8
+		bit.b	#00000100b, R8
+		jz		LED3off
+		bis.b	#BIT2, &P6OUT				; set HIGH
+		jmp		LED4
+LED3off:
+		bic.b	#BIT2, &P6OUT
+
+LED4:
+		mov.w	Output, R8
+		bit.b	#00001000b, R8
+		jz		LED4off
+		bis.b	#BIT3, &P6OUT				; set HIGH
+		jmp		LED5
+LED4off:
+		bic.b	#BIT3, &P6OUT
+
+LED5:
+		mov.w	Output, R8
+		bit.b	#00010000b, R8
+		jz		LED5off
+		bis.b	#BIT4, &P6OUT				; set HIGH
+		jmp		LED6
+LED5off:
+		bic.b	#BIT4, &P6OUT
+
+LED6:
+		mov.w	Output, R8
+		bit.b	#00100000b, R8
+		jz		LED6off
+		bis.b	#BIT7, &P3OUT				; set HIGH
+		jmp		LED7
+LED6off:
+		bic.b	#BIT7, &P3OUT
+
+LED7:
+		mov.w	Output, R8
+		bit.b	#01000000b, R8
+		jz		LED7off
+		bis.b	#BIT4, &P2OUT				; set HIGH
+		jmp		LED8
+LED7off:
+		bic.b	#BIT4, &P2OUT
+
+LED8:
+		mov.w	Output, R8
+		bit.b	#10000000b, R8
+		jz		LED8off
+		bis.b	#BIT3, &P3OUT				; set HIGH
+		jmp		LEDend
+LED8off:
+		bic.b	#BIT3, &P3OUT
+
+LEDend:
+		ret
+;--------------------------------- END Output -----------------------------------
 ;-------------------------------------------------------------------------------
 ; Interrupt Service Routines
 ;-------------------------------------------------------------------------------
 TimerB1_Switch:
-		cmp.b		#00h, Setpattern
+		cmp.b		#00h, SetPattern
 		jz			Pattern0
 
-		cmp.b		#01h, Setpattern
+		cmp.b		#01h, SetPattern
 		jz			Pattern1
 
-		cmp.b		#02h, Setpattern
+		cmp.b		#02h, SetPattern
 		jz			Pattern2
 
-		cmp.b		#03h, Setpattern
+		cmp.b		#03h, SetPattern
 		jz			Pattern3
 
 Pattern0:
