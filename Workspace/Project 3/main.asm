@@ -466,35 +466,55 @@ Pattern2b:
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 Pattern3:
+		inc.b	R7
+		bit.b	#01b, R7
+		jz		Pattern3Start
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
+
+Pattern3Start:
 		inc.b	R10
-		bit.b	#00h, R10
-		bit.b	#00h, R10
-		bit.b	#00h, R10
-		bit.b	#00h, R10
-		bit.b	#00h, R10
-		bit.b	#00h, R10
+		cmp.b	#01h, R10
+		jz		Pattern3a
+		cmp.b	#02h, R10
+		jz		Pattern3b
+		cmp.b	#03h, R10
+		jz		Pattern3c
+		cmp.b	#04h, R10
+		jz		Pattern3d
+		cmp.b	#05h, R10
+		jz		Pattern3e
+		cmp.b	#06h, R10
+		jz		Pattern3f
 
 Pattern3a:
+		mov.w	#00011000b, Output
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 
 Pattern3b:
+		mov.w	#00100100b, Output
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 
 Pattern3c:
+		mov.w	#01000010b, Output
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 
-Pattern3a:
+Pattern3d:
+		mov.w	#10000001b, Output
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 
-Pattern3a:
+Pattern3e:
+		mov.w	#01000010b, Output
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 
-Pattern3a:
+Pattern3f:
+		mov.w	#00100100b, Output
+		mov.w	#00h, R10
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 
