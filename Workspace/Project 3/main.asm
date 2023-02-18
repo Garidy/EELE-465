@@ -5,7 +5,8 @@
 ; Interface with a keypad
 ;
 ;	Registers
-;
+;	R11:	Code State
+;	R12:	Lock/Unlock
 ;
 ;	Variables
 ;	Rx:
@@ -145,6 +146,7 @@ main:
 
 		call 	#CheckKeypad
 		call	#CheckPattern
+		call	#CheckCode
 		call	#OutputLED
 
 		jmp		main						; loop main
@@ -344,8 +346,55 @@ SetPattern3:
 		mov.w	#00h, Rx
 		ret
 
-
 ;--------------------------------- END Check Keypad -----------------------------------
+;-------------------------------------------------------------------------------
+; CheckCode
+;-------------------------------------------------------------------------------
+CheckCode:
+		mov.w	Rx, R13
+		; check what state the code is in, jmp depending on the current state
+		cmp.b	#00h, R11
+		jz		SetCode1
+		cmp.b	#01h, R11
+		jz		SetCode2
+		cmp.b	#02h, R11
+		jz		SetCode3
+
+		ret
+
+SetCode1:
+		; check if the first button is pressed, if so - update R11, if not - reset R11
+		cmp.b	#11h, Rx
+		jz		CodeCorrect1
+		mov.w	#00h, R11
+		ret
+
+CodeCorrect1:
+		mov.w	#01h, R11
+		ret
+SetCode2:
+		cmp.b	#21h, Rx
+		jz		CodeCorrect2
+		mov.w	#00h, R11
+		ret
+
+CodeCorrect2:
+		mov.w	#02h, R11
+		ret
+
+SetCode3:
+		cmp.b	#41h, Rx
+		jz		CodeCorrect3
+		mov.w	#00h, R11
+		ret
+
+CodeCorrect3:
+		mov.w	#00h, R11
+		mov.w	#01h, R12
+		ret
+
+
+;--------------------------------- END Check Code -----------------------------------
 ;-------------------------------------------------------------------------------
 ; Output
 ;-------------------------------------------------------------------------------
