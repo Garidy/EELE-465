@@ -142,9 +142,6 @@ init:
 
 
 main:
-		mov.w	SetPattern, R7
-		mov.w	Output, R8
-		mov.w	Rx, R6
 
 		call 	#CheckKeypad
 		call	#CheckPattern
@@ -325,21 +322,26 @@ CheckPattern:
 SetPattern0:
 		mov.w	#00000000b, SetPattern
 		mov.w	#10101010b, Output
+		mov.w	#00h, Rx
 		ret
 
 SetPattern1:
 		mov.w	#00000001b, SetPattern
 		mov.w	#00000000b, Output
+		mov.w	#00h, Rx
 		ret
 
 SetPattern2:
 		mov.w	#00000010b, SetPattern
 		mov.w	#01111111b, Output
+		mov.w	#01b, R9
+		mov.w	#00h, Rx
 		ret
 
 SetPattern3:
 		mov.w	#00000011b, SetPattern
 		mov.w	#00011000b, Output
+		mov.w	#00h, Rx
 		ret
 
 
@@ -443,15 +445,56 @@ Pattern0:
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 Pattern1:
-
+		inc.b	Output
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 Pattern2:
+		inc.b	R7
+		bit.b	#01b, R7
+		jz		Pattern2a
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
+Pattern2a:
+		bit.b	#01b, R9			; check carry flag
+		jz		Pattern2b
+		setc
 
+Pattern2b:
+		bic.b	#01b, R9
+		rrc.b	Output
+		adc.b	R9
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 Pattern3:
+		inc.b	R10
+		bit.b	#00h, R10
+		bit.b	#00h, R10
+		bit.b	#00h, R10
+		bit.b	#00h, R10
+		bit.b	#00h, R10
+		bit.b	#00h, R10
 
+Pattern3a:
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
+
+Pattern3b:
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
+
+Pattern3c:
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
+
+Pattern3a:
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
+
+Pattern3a:
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
+
+Pattern3a:
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 
