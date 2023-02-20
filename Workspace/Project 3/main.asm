@@ -5,7 +5,8 @@
 ; Interface with a keypad
 ;
 ;	Registers
-;
+;	R11:	Code State
+;	R12:	Lock/Unlock ( 0 = Locked, 1 = Unlocked )
 ;
 ;	Variables
 ;	Rx:
@@ -114,12 +115,13 @@ init:
 		bis.b	#BIT4, &P2DIR				; set P2.4 as an output
 		bis.b	#BIT4, &P2OUT				; init HIGH
 
-		bic.b	#BIT3, &P3SEL0
-		bic.b	#BIT3, &P3SEL1				; set as digital I/O port
-		bis.b	#BIT3, &P3DIR				; set P3.3 as an output
-		bis.b	#BIT3, &P3OUT				; init HIGH
+		bic.b	#BIT2, &P3SEL0
+		bic.b	#BIT2, &P3SEL1				; set as digital I/O port
+		bis.b	#BIT2, &P3DIR				; set P3.3 as an output
+		bis.b	#BIT2, &P3OUT				; init HIGH
 
 		mov.w	#00000000b, R6				; Rx
+		mov.w	#0h, R12
 
 ;-- Setup Timer B1
 		bis.w	#TBCLR, &TB1CTL
@@ -142,12 +144,13 @@ init:
 
 
 main:
-		mov.w	SetPattern, R7
-		mov.w	Output, R8
-		mov.w	Rx, R6
+		cmp.w	#00h, R12
+		jz		CheckCode
 
 		call 	#CheckKeypad
 		call	#CheckPattern
+		call	#OutputLED
+
 
 		jmp		main						; loop main
 
@@ -324,55 +327,230 @@ CheckPattern:
 SetPattern0:
 		mov.w	#00000000b, SetPattern
 		mov.w	#10101010b, Output
+		mov.w	#00h, Rx
 		ret
 
 SetPattern1:
 		mov.w	#00000001b, SetPattern
 		mov.w	#00000000b, Output
+		mov.w	#00h, Rx
 		ret
 
 SetPattern2:
 		mov.w	#00000010b, SetPattern
 		mov.w	#01111111b, Output
+		mov.w	#01b, R9
+		mov.w	#00h, Rx
 		ret
 
 SetPattern3:
 		mov.w	#00000011b, SetPattern
 		mov.w	#00011000b, Output
+		mov.w	#00h, Rx
 		ret
 
-
 ;--------------------------------- END Check Keypad -----------------------------------
+;-------------------------------------------------------------------------------
+; CheckCode
+;-------------------------------------------------------------------------------
 
+;CODE: 123
+
+CheckCode:		; check what state the code is in, jmp depending on the current state
+		mov.w	Rx, R13
+
+Num1:
+		call 	#CheckKeypad
+		cmp.b	#88h, Rx
+		jnz		Num1
+
+Num2:
+		call 	#CheckKeypad
+		cmp.b	#84h, Rx
+		jnz		Num2
+
+Num3:
+		call 	#CheckKeypad
+		cmp.b	#82h, Rx
+		jnz		Num3
+
+		mov.w	#01h, R12
+
+		jmp 	main
+
+
+
+;--------------------------------- END Check Code -----------------------------------
+;-------------------------------------------------------------------------------
+; Output
+;-------------------------------------------------------------------------------
+
+OutputLED:
+		mov.w	Output, R8
+		bit.b	#00000001b, R8
+		jz		LED1off
+		bis.b	#BIT0, &P6OUT				; set HIGH
+		jmp		LED2
+LED1off:
+		bic.b	#BIT0, &P6OUT
+
+LED2:
+		mov.w	Output, R8
+		bit.b	#00000010b, R8
+		jz		LED2off
+		bis.b	#BIT1, &P6OUT				; set HIGH
+		jmp		LED3
+LED2off:
+		bic.b	#BIT1, &P6OUT
+
+LED3:
+		mov.w	Output, R8
+		bit.b	#00000100b, R8
+		jz		LED3off
+		bis.b	#BIT2, &P6OUT				; set HIGH
+		jmp		LED4
+LED3off:
+		bic.b	#BIT2, &P6OUT
+
+LED4:
+		mov.w	Output, R8
+		bit.b	#00001000b, R8
+		jz		LED4off
+		bis.b	#BIT3, &P6OUT				; set HIGH
+		jmp		LED5
+LED4off:
+		bic.b	#BIT3, &P6OUT
+
+LED5:
+		mov.w	Output, R8
+		bit.b	#00010000b, R8
+		jz		LED5off
+		bis.b	#BIT4, &P6OUT				; set HIGH
+		jmp		LED6
+LED5off:
+		bic.b	#BIT4, &P6OUT
+
+LED6:
+		mov.w	Output, R8
+		bit.b	#00100000b, R8
+		jz		LED6off
+		bis.b	#BIT7, &P3OUT				; set HIGH
+		jmp		LED7
+LED6off:
+		bic.b	#BIT7, &P3OUT
+
+LED7:
+		mov.w	Output, R8
+		bit.b	#01000000b, R8
+		jz		LED7off
+		bis.b	#BIT4, &P2OUT				; set HIGH
+		jmp		LED8
+LED7off:
+		bic.b	#BIT4, &P2OUT
+
+LED8:
+		mov.w	Output, R8
+		bit.b	#10000000b, R8
+		jz		LED8off
+		bis.b	#BIT2, &P3OUT				; set HIGH
+		jmp		LEDend
+LED8off:
+		bic.b	#BIT2, &P3OUT
+
+LEDend:
+		ret
+;--------------------------------- END Output -----------------------------------
 ;-------------------------------------------------------------------------------
 ; Interrupt Service Routines
 ;-------------------------------------------------------------------------------
 TimerB1_Switch:
-		cmp.b		#00h, Setpattern
+		cmp.b		#00h, SetPattern
 		jz			Pattern0
 
-		cmp.b		#01h, Setpattern
+		cmp.b		#01h, SetPattern
 		jz			Pattern1
 
-		cmp.b		#02h, Setpattern
+		cmp.b		#02h, SetPattern
 		jz			Pattern2
 
-		cmp.b		#03h, Setpattern
+		cmp.b		#03h, SetPattern
 		jz			Pattern3
 
 Pattern0:
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 Pattern1:
-
+		inc.b	Output
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 Pattern2:
+		inc.b	R7
+		bit.b	#01b, R7
+		jz		Pattern2a
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
+Pattern2a:
+		bit.b	#01b, R9			; check carry flag
+		jz		Pattern2b
+		setc
 
+Pattern2b:
+		bic.b	#01b, R9
+		rrc.b	Output
+		mov.w	Output, R8
+		adc.b	R9
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 Pattern3:
+		inc.b	R7
+		bit.b	#01b, R7
+		jz		Pattern3Start
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
 
+Pattern3Start:
+		inc.b	R10
+		cmp.b	#01h, R10
+		jz		Pattern3a
+		cmp.b	#02h, R10
+		jz		Pattern3b
+		cmp.b	#03h, R10
+		jz		Pattern3c
+		cmp.b	#04h, R10
+		jz		Pattern3d
+		cmp.b	#05h, R10
+		jz		Pattern3e
+		cmp.b	#06h, R10
+		jz		Pattern3f
+
+Pattern3a:
+		mov.w	#00011000b, Output
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
+
+Pattern3b:
+		mov.w	#00100100b, Output
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
+
+Pattern3c:
+		mov.w	#01000010b, Output
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
+
+Pattern3d:
+		mov.w	#10000001b, Output
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
+
+Pattern3e:
+		mov.w	#01000010b, Output
+		bic.w	#CCIFG, &TB1CCTL0	; clear flag
+		reti
+
+Pattern3f:
+		mov.w	#00100100b, Output
+		mov.w	#00h, R10
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 

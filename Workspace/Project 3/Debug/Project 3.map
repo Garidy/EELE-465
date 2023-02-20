@@ -1,7 +1,7 @@
 ******************************************************************************
                   MSP430 Linker PC v21.6.1                     
 ******************************************************************************
->> Linked Tue Feb 14 11:54:56 2023
+>> Linked Sun Feb 19 19:58:56 2023
 
 OUTPUT FILE NAME:   <Project 3.out>
 ENTRY POINT SYMBOL: "RESET"  address: 00008000
@@ -16,8 +16,8 @@ MEMORY CONFIGURATION
   INFO                  00001800   00000200  00000000  00000200  RWIX
   TLVMEM                00001a00   00000200  00000000  00000200  RWIX
   BOOTCODE              00001c00   00000400  00000000  00000400  RWIX
-  RAM                   00002000   00001000  00000002  00000ffe  RWIX
-  FRAM                  00008000   00007f80  00000216  00007d6a  RWIX
+  RAM                   00002000   00001000  00000006  00000ffa  RWIX
+  FRAM                  00008000   00007f80  000004f8  00007a88  RWIX
   JTAGSIGNATURE         0000ff80   00000004  00000004  00000000  RWIX  ffff 
   BSLSIGNATURE          0000ff84   00000004  00000004  00000000  RWIX  ffff 
   BSLCONFIGURATIONSIGNA 0000ff88   00000002  00000002  00000000  RWIX  ffff 
@@ -103,15 +103,15 @@ section   page    origin      length       input sections
 
 .const     0    00008000    00000000     UNINITIALIZED
 
-.text      0    00008000    0000020e     
-                  00008000    0000020e     main.obj (.text)
+.text      0    00008000    000004f0     
+                  00008000    000004f0     main.obj (.text)
 
 .text:_isr 
-*          0    0000820e    00000008     
-                  0000820e    00000008     rts430x_sc_sd_eabi.lib : isr_trap.asm.obj (.text:_isr:__TI_ISR_TRAP)
+*          0    000084f0    00000008     
+                  000084f0    00000008     rts430x_sc_sd_eabi.lib : isr_trap.asm.obj (.text:_isr:__TI_ISR_TRAP)
 
-.data      0    00002000    00000002     
-                  00002000    00000002     main.obj (.data)
+.data      0    00002000    00000006     
+                  00002000    00000006     main.obj (.data)
 
 .stack     0    00003000    00000000     
 
@@ -182,7 +182,7 @@ TIMER1_B1
 
 TIMER1_B0 
 *          0    0000fff4    00000002     
-                  0000fff4    00000002     rts430x_sc_sd_eabi.lib : int41.asm.obj (.int41)
+                  0000fff4    00000002     main.obj (.int41)
 
 TIMER0_B1 
 *          0    0000fff6    00000002     
@@ -221,9 +221,9 @@ MODULE SUMMARY
        Module             code   ro data   rw data
        ------             ----   -------   -------
     .\
-       main.obj           526    2         2      
+       main.obj           1264   4         6      
     +--+------------------+------+---------+---------+
-       Total:             526    2         2      
+       Total:             1264   4         6      
                                                   
     C:\ti\ccs1220\ccs\tools\compiler\ti-cgt-msp430_21.6.1.LTS\lib\rts430x_sc_sd_eabi.lib
        isr_trap.asm.obj   8      0         0      
@@ -246,16 +246,15 @@ MODULE SUMMARY
        int38.asm.obj      0      2         0      
        int39.asm.obj      0      2         0      
        int40.asm.obj      0      2         0      
-       int41.asm.obj      0      2         0      
        int42.asm.obj      0      2         0      
        int43.asm.obj      0      2         0      
        int44.asm.obj      0      2         0      
        int45.asm.obj      0      2         0      
     +--+------------------+------+---------+---------+
-       Total:             8      48        0      
+       Total:             8      46        0      
                                                   
     +--+------------------+------+---------+---------+
-       Grand Total:       534    50        2      
+       Grand Total:       1272   50        6      
 
 
 GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name 
@@ -1171,7 +1170,7 @@ address   name
 000001cc  WDTCTL_L                       
 00003000  __STACK_END                    
 00000000  __STACK_SIZE                   
-0000820e  __TI_ISR_TRAP                  
+000084f0  __TI_ISR_TRAP                  
 0000ffce  __TI_int22                     
 0000ffd0  __TI_int23                     
 0000ffd2  __TI_int24                     
@@ -2127,7 +2126,7 @@ address   name
 00008000  RESET                          
 00008000  fram_rw_start                  
 00008000  fram_rx_start                  
-0000820e  __TI_ISR_TRAP                  
+000084f0  __TI_ISR_TRAP                  
 0000ffce  __TI_int22                     
 0000ffd0  __TI_int23                     
 0000ffd2  __TI_int24                     
