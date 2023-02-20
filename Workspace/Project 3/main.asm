@@ -5,8 +5,12 @@
 ; Interface with a keypad
 ;
 ;	Registers
+;	R4:		Outer Delay
+;	R5:		Inner Delay
+;	R7-10:  Pattern Numbers
 ;	R11:	Code State
 ;	R12:	Lock/Unlock ( 0 = Locked, 1 = Unlocked )
+;	R13:	Password input count
 ;
 ;	Variables
 ;	Rx:
@@ -120,8 +124,12 @@ init:
 		bis.b	#BIT2, &P3DIR				; set P3.3 as an output
 		bis.b	#BIT2, &P3OUT				; init HIGH
 
-		mov.w	#00000000b, R6				; Rx
-		mov.w	#0h, R12
+		;mov.w	#00000000b, R6				; Rx
+		mov.w	#00h, R12
+		mov.w	#00h, R13
+		mov.w	#00h, R14
+		mov.w	#00h, R15
+
 
 ;-- Setup Timer B1
 		bis.w	#TBCLR, &TB1CTL
@@ -215,6 +223,8 @@ CheckKeypad:
 		bit.b	#00000100b, &P5IN			; look at D4
 		jnz		D4Set
 
+		mov.b	#00h, Rx
+
 		ret
 
 D1Set:
@@ -277,6 +287,8 @@ CheckRows:
 		jnz		D7Set
 		bit.b	#00100000b, &P1IN			; look at D8
 		jnz		D8Set
+
+		mov.b	#00h, Rx
 
 		ret
 D5Set:
@@ -357,26 +369,87 @@ SetPattern3:
 ;CODE: 123
 
 CheckCode:		; check what state the code is in, jmp depending on the current state
-		mov.w	Rx, R13
+		mov.w	Rx, R15
+		call	#CheckKeypad
+		mov.w	Rx, R15
+
+
+		cmp.b	#012h, Rx
+
+		jz		ResetCode
+
+
+		; Prevent same button press from being detected more than once
+		cmp.b	#00h, R14
+		jnz		EndPass
+		cmp.b	#00h, R15
+		jz		EndPass
+
+
+		; Check value of count and write to respective data
+		cmp.b	#00h, R13
+		jz		Num1
+		cmp.b	#01h, R13
+		jz		Num2
+		cmp.b	#02h, R13
+		jz		Num3
+
+		jmp		EndPass
 
 Num1:
-		call 	#CheckKeypad
-		cmp.b	#88h, Rx
-		jnz		Num1
+		mov.b	Rx, Passcode_D1
+		jmp		EndDigits
 
 Num2:
-		call 	#CheckKeypad
-		cmp.b	#84h, Rx
-		jnz		Num2
+		mov.b	Rx, Passcode_D2
+		jmp		EndDigits
 
 Num3:
-		call 	#CheckKeypad
-		cmp.b	#82h, Rx
-		jnz		Num3
+		mov.b	Rx, Passcode_D3
+		jmp		EndDigits
 
-		mov.w	#01h, R12
+EndDigits:
+		cmp.b	#02h, R13
+		jnz		IncPassCount
+		mov.b	#00h, R13
+
+PasswordCmp:
+		cmp.b	#088h, Passcode_D1
+		jnz		EndPass
+		cmp.b	#084h, Passcode_D2
+		jnz		EndPass
+		cmp.b	#082h, Passcode_D3
+		jnz		EndPass
+
+		;Correct Passcode
+		mov.b	#01h, R12
+
+		mov.b	#00h, R14
+		mov.b	#00h, R15
+		jmp 	main
+
+IncPassCount:
+		inc.b	R13
+
+EndPass:
+		mov.b	R15, R14
+		mov.b	#00h, R15
+		jmp		main
+
+ResetCode:
+		mov.b	#00h, R13
+		mov.b	#00h, R14
+		mov.b	#00h, R15
+
+		mov.b	#0FFh, Passcode_D1
+		mov.b	#0FFh, Passcode_D2
+		mov.b	#0FFh, Passcode_D3
+		mov.b	#0FFh, Passcode_D4
+
+
 
 		jmp 	main
+
 
 
 
@@ -564,12 +637,16 @@ Pattern3f:
 			.data								; go to data memory
 			.retain								; keep this section
 
-Rx:			.space	2
+Rx:				.space	2
 
-SetPattern:	.space 	2
+SetPattern:		.space 	2
 
-Output:		.space	2
+Output:			.space	2
 
+Passcode_D1:	.space	2
+Passcode_D2:	.space	2
+Passcode_D3:	.space	2
+Passcode_D4:	.space	2
 
 ;-------------------------------------------------------------------------------
 ; Stack Pointer definition
