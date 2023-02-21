@@ -5,6 +5,8 @@
 ; Interface with a keypad
 ;
 ;	Registers
+;	R4:		Outer Delay
+;	R5:		Inner Delay
 ;	R7-10:  Pattern Numbers
 ;	R11:	Code State
 ;	R12:	Lock/Unlock ( 0 = Locked, 1 = Unlocked )
@@ -171,6 +173,22 @@ main:
 
 
 ;-------------------------------------------------------------------------------
+; Long Delay
+;-------------------------------------------------------------------------------
+LongDelay:
+		mov.w	#09h, R5					; Set Inner Delay Loop
+
+LongFor:
+		dec		R5								; decrement inner Delay loop
+		jnz		LongFor							; loop through for loop
+EndLongFor:
+
+		dec		R4								; decrement outer Delay loop
+		jnz		LongDelay						; jump to the beginning of Delay subroutine
+
+		ret									; return
+;--------------------------------- END Long Delay -----------------------------------
+;-------------------------------------------------------------------------------
 ; Check Keypad
 ;-------------------------------------------------------------------------------
 CheckKeypad:
@@ -285,25 +303,34 @@ CheckRows:
 D5Set:
 		bic.b	#11110000b, Rx
 		bis.b	#00010000b, Rx
-		ret
+		jmp		KeypadDebounce
 
 D6Set:
 		bic.b	#11110000b, Rx
 		bis.b	#00100000b, Rx
-		ret
+		jmp		KeypadDebounce
 
 D7Set:
 		bic.b	#11110000b, Rx
 		bis.b	#01000000b, Rx
-		ret
+		jmp		KeypadDebounce
 
 D8Set:
 		bic.b	#11110000b, Rx
 		bis.b	#10000000b, Rx
+		jmp		KeypadDebounce
+
+KeypadDebounce:
+		cmp.b	Rx, R6
+		jnz		EndKeypad
+		mov.b	#05h, R5
+		mov.b	#05h, R4
+		call	#LongDelay
+
+EndKeypad:
+		mov.b	Rx, R6
 		ret
 
-
-		ret									; return
 ;--------------------------------- END Check Keypad -----------------------------------
 ;-------------------------------------------------------------------------------
 ; CheckPattern
@@ -314,6 +341,7 @@ CheckPattern:
 ;if code = 41 => pattern 2
 ;if code = 21 => pattern 3
 ;if code = 11 => pattern 4
+
 
 
 		cmp.b	#81h, Rx
@@ -335,20 +363,54 @@ SetPattern0:
 		ret
 
 SetPattern1:
+		cmp.b	LastPattern, SetPattern
+		jz		ResetPattern1
 		mov.w	#00000001b, SetPattern
+		;mov.w	OutputB, Output
 		mov.w	#00h, Rx
+		mov.b	SetPattern, LastPattern
 		ret
 
 SetPattern2:
+		cmp.b	LastPattern, SetPattern
+		jz		ResetPattern2
 		mov.w	#00000010b, SetPattern
+		;mov.w	#OutputC, Output
 		mov.w	#01b, R9
 		mov.w	#00h, Rx
+				mov.b	SetPattern, LastPattern
+
 		ret
 
 SetPattern3:
+		cmp.b	LastPattern, SetPattern
+		jz		ResetPattern3
 		mov.w	#00000011b, SetPattern
+		;mov.w	#OutputD, Output
+		mov.w	#00h, Rx
+		mov.b	SetPattern, LastPattern
+		ret
+
+ResetPattern1:
+		mov.w	#00000001b, SetPattern
+		mov.w	#00000000b, OutputB
 		mov.w	#00h, Rx
 		ret
+
+
+ResetPattern2:
+		mov.w	#00000010b, SetPattern
+		mov.w	#01111111b, OutputC
+		mov.w	#00h, Rx
+		ret
+
+
+ResetPattern3:
+		mov.w	#00000011b, SetPattern
+		mov.w	#00011000b, OutputD
+		mov.w	#00h, Rx
+		ret
+
 
 ;--------------------------------- END Check Keypad -----------------------------------
 ;-------------------------------------------------------------------------------
@@ -643,6 +705,7 @@ OutputB:		.space	2
 OutputC:		.space	2
 OutputD:		.space	2
 
+LastPattern:	.space	2
 
 Passcode_D1:	.space	2
 Passcode_D2:	.space	2
