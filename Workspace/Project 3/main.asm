@@ -323,9 +323,7 @@ D8Set:
 KeypadDebounce:
 		cmp.b	Rx, R6
 		jnz		EndKeypad
-		mov.b	#05h, R5
-		mov.b	#05h, R4
-		call	#LongDelay
+
 
 EndKeypad:
 		mov.b	Rx, R6
@@ -363,52 +361,79 @@ SetPattern0:
 		ret
 
 SetPattern1:
+		mov.w	#00000001b, SetPattern
 		cmp.b	LastPattern, SetPattern
 		jz		ResetPattern1
-		mov.w	#00000001b, SetPattern
 		;mov.w	OutputB, Output
 		mov.w	#00h, Rx
 		mov.b	SetPattern, LastPattern
+
+		mov.b	#010h, R5
+		mov.b	#010h, R4
+		call	#LongDelay
+
 		ret
 
 SetPattern2:
+		mov.w	#00000010b, SetPattern
 		cmp.b	LastPattern, SetPattern
 		jz		ResetPattern2
-		mov.w	#00000010b, SetPattern
 		;mov.w	#OutputC, Output
 		mov.w	#01b, R9
 		mov.w	#00h, Rx
-				mov.b	SetPattern, LastPattern
+		mov.b	SetPattern, LastPattern
+
+		mov.b	#010h, R5
+		mov.b	#010h, R4
+		call	#LongDelay
 
 		ret
 
 SetPattern3:
+		mov.w	#00000011b, SetPattern
 		cmp.b	LastPattern, SetPattern
 		jz		ResetPattern3
-		mov.w	#00000011b, SetPattern
 		;mov.w	#OutputD, Output
 		mov.w	#00h, Rx
 		mov.b	SetPattern, LastPattern
+
+
+		mov.b	#010h, R5
+		mov.b	#010h, R4
+		call	#LongDelay
+
 		ret
 
 ResetPattern1:
-		mov.w	#00000001b, SetPattern
 		mov.w	#00000000b, OutputB
 		mov.w	#00h, Rx
+
+
+		mov.b	#010h, R5
+		mov.b	#010h, R4
+		call	#LongDelay
 		ret
 
 
 ResetPattern2:
-		mov.w	#00000010b, SetPattern
 		mov.w	#01111111b, OutputC
 		mov.w	#00h, Rx
+
+
+		mov.b	#010h, R5
+		mov.b	#010h, R4
+		call	#LongDelay
 		ret
 
 
 ResetPattern3:
-		mov.w	#00000011b, SetPattern
 		mov.w	#00011000b, OutputD
 		mov.w	#00h, Rx
+
+
+		mov.b	#010h, R5
+		mov.b	#010h, R4
+		call	#LongDelay
 		ret
 
 
