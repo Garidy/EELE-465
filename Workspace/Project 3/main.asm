@@ -5,8 +5,6 @@
 ; Interface with a keypad
 ;
 ;	Registers
-;	R4:		Outer Delay
-;	R5:		Inner Delay
 ;	R7-10:  Pattern Numbers
 ;	R11:	Code State
 ;	R12:	Lock/Unlock ( 0 = Locked, 1 = Unlocked )
@@ -87,42 +85,51 @@ init:
 		bic.b	#BIT0, &P6SEL0
 		bic.b	#BIT0, &P6SEL1				; set as digital I/O port
 		bis.b	#BIT0, &P6DIR				; set P6.0 as an output
-		bis.b	#BIT0, &P6OUT				; init HIGH
+		bic.b	#BIT0, &P6OUT				; init LOW
 
 		bic.b	#BIT1, &P6SEL0
 		bic.b	#BIT1, &P6SEL1				; set as digital I/O port
 		bis.b	#BIT1, &P6DIR				; set P6.1 as an output
-		bis.b	#BIT1, &P6OUT				; init HIGH
+		bic.b	#BIT1, &P6OUT				; init LOW
 
 		bic.b	#BIT2, &P6SEL0
 		bic.b	#BIT2, &P6SEL1				; set as digital I/O port
 		bis.b	#BIT2, &P6DIR				; set P6.2 as an output
-		bis.b	#BIT2, &P6OUT				; init HIGH
+		bic.b	#BIT2, &P6OUT				; init LOW
 
 		bic.b	#BIT3, &P6SEL0
 		bic.b	#BIT3, &P6SEL1				; set as digital I/O port
 		bis.b	#BIT3, &P6DIR				; set P6.3 as an output
-		bis.b	#BIT3, &P6OUT				; init HIGH
+		bic.b	#BIT3, &P6OUT				; init LOW
 
 		bic.b	#BIT4, &P6SEL0
 		bic.b	#BIT4, &P6SEL1				; set as digital I/O port
 		bis.b	#BIT4, &P6DIR				; set P6.4 as an output
-		bis.b	#BIT4, &P6OUT				; init HIGH
+		bic.b	#BIT4, &P6OUT				; init LOW
 
 		bic.b	#BIT7, &P3SEL0
 		bic.b	#BIT7, &P3SEL1				; set as digital I/O port
 		bis.b	#BIT7, &P3DIR				; set P3.7 as an output
-		bis.b	#BIT7, &P3OUT				; init HIGH
+		bic.b	#BIT7, &P3OUT				; init LOW
 
 		bic.b	#BIT4, &P2SEL0
 		bic.b	#BIT4, &P2SEL1				; set as digital I/O port
 		bis.b	#BIT4, &P2DIR				; set P2.4 as an output
-		bis.b	#BIT4, &P2OUT				; init HIGH
+		bic.b	#BIT4, &P2OUT				; init LOW
 
 		bic.b	#BIT2, &P3SEL0
 		bic.b	#BIT2, &P3SEL1				; set as digital I/O port
 		bis.b	#BIT2, &P3DIR				; set P3.3 as an output
-		bis.b	#BIT2, &P3OUT				; init HIGH
+		bic.b	#BIT2, &P3OUT				; init LOW
+
+		mov.w	#10101010b, OutputA
+		mov.w	#00000000b, OutputB
+		mov.w	#01111111b, OutputC
+		mov.w	#00011000b, OutputD
+
+
+
+
 
 		;mov.w	#00000000b, R6				; Rx
 		mov.w	#00h, R12
@@ -163,22 +170,6 @@ main:
 		jmp		main						; loop main
 
 
-;-------------------------------------------------------------------------------
-; Long Delay
-;-------------------------------------------------------------------------------
-LongDelay:
-		mov.w	#09h, R5					; Set Inner Delay Loop
-
-LongFor:
-		dec		R5								; decrement inner Delay loop
-		jnz		LongFor							; loop through for loop
-EndLongFor:
-
-		dec		R4								; decrement outer Delay loop
-		jnz		LongDelay						; jump to the beginning of Delay subroutine
-
-		ret									; return
-;--------------------------------- END Long Delay -----------------------------------
 ;-------------------------------------------------------------------------------
 ; Check Keypad
 ;-------------------------------------------------------------------------------
@@ -324,6 +315,7 @@ CheckPattern:
 ;if code = 21 => pattern 3
 ;if code = 11 => pattern 4
 
+
 		cmp.b	#81h, Rx
 		jz		SetPattern0
 		cmp.b	#41h, Rx
@@ -338,26 +330,23 @@ CheckPattern:
 
 SetPattern0:
 		mov.w	#00000000b, SetPattern
-		mov.w	#10101010b, Output
+		mov.w	OutputA, Output
 		mov.w	#00h, Rx
 		ret
 
 SetPattern1:
 		mov.w	#00000001b, SetPattern
-		mov.w	#00000000b, Output
 		mov.w	#00h, Rx
 		ret
 
 SetPattern2:
 		mov.w	#00000010b, SetPattern
-		mov.w	#01111111b, Output
 		mov.w	#01b, R9
 		mov.w	#00h, Rx
 		ret
 
 SetPattern3:
 		mov.w	#00000011b, SetPattern
-		mov.w	#00011000b, Output
 		mov.w	#00h, Rx
 		ret
 
@@ -375,7 +364,6 @@ CheckCode:		; check what state the code is in, jmp depending on the current stat
 
 
 		cmp.b	#012h, Rx
-
 		jz		ResetCode
 
 
@@ -553,7 +541,8 @@ Pattern0:
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 Pattern1:
-		inc.b	Output
+		inc.b	OutputB
+		mov.w	OutputB, Output
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 Pattern2:
@@ -569,8 +558,9 @@ Pattern2a:
 
 Pattern2b:
 		bic.b	#01b, R9
-		rrc.b	Output
-		mov.w	Output, R8
+		rrc.b	OutputC
+		mov.w	OutputC, R8
+		mov.w	OutputC, Output
 		adc.b	R9
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
@@ -597,32 +587,38 @@ Pattern3Start:
 		jz		Pattern3f
 
 Pattern3a:
-		mov.w	#00011000b, Output
+		mov.w	#00011000b, OutputD
+		mov.w	OutputD, Output
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 
 Pattern3b:
-		mov.w	#00100100b, Output
+		mov.w	#00100100b, OutputD
+		mov.w	OutputD, Output
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 
 Pattern3c:
-		mov.w	#01000010b, Output
+		mov.w	#01000010b, OutputD
+		mov.w	OutputD, Output
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 
 Pattern3d:
-		mov.w	#10000001b, Output
+		mov.w	#10000001b, OutputD
+		mov.w	OutputD, Output
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 
 Pattern3e:
-		mov.w	#01000010b, Output
+		mov.w	#01000010b, OutputD
+		mov.w	OutputD, Output
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
 
 Pattern3f:
-		mov.w	#00100100b, Output
+		mov.w	#00100100b, OutputD
+		mov.w	OutputD, Output
 		mov.w	#00h, R10
 		bic.w	#CCIFG, &TB1CCTL0	; clear flag
 		reti
@@ -642,6 +638,11 @@ Rx:				.space	2
 SetPattern:		.space 	2
 
 Output:			.space	2
+OutputA:		.space	2
+OutputB:		.space	2
+OutputC:		.space	2
+OutputD:		.space	2
+
 
 Passcode_D1:	.space	2
 Passcode_D2:	.space	2
