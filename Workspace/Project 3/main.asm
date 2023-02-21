@@ -164,7 +164,11 @@ main:
 		cmp.w	#00h, R12
 		jz		CheckCode
 
+
+
 		call 	#CheckKeypad
+		mov.b	#10, R4				; 1s outer loop value in R15 for delay subroutine
+		call	#LongDelay
 		call	#CheckPattern
 		call	#OutputLED
 
@@ -176,7 +180,7 @@ main:
 ; Long Delay
 ;-------------------------------------------------------------------------------
 LongDelay:
-		mov.w	#09h, R5					; Set Inner Delay Loop
+		mov.w	#00662h, R5					; Set Inner Delay Loop
 
 LongFor:
 		dec		R5								; decrement inner Delay loop
@@ -303,31 +307,22 @@ CheckRows:
 D5Set:
 		bic.b	#11110000b, Rx
 		bis.b	#00010000b, Rx
-		jmp		KeypadDebounce
+		ret
 
 D6Set:
 		bic.b	#11110000b, Rx
 		bis.b	#00100000b, Rx
-		jmp		KeypadDebounce
+		ret
 
 D7Set:
 		bic.b	#11110000b, Rx
 		bis.b	#01000000b, Rx
-		jmp		KeypadDebounce
-
+		ret
 D8Set:
 		bic.b	#11110000b, Rx
 		bis.b	#10000000b, Rx
-		jmp		KeypadDebounce
-
-KeypadDebounce:
-		cmp.b	Rx, R6
-		jnz		EndKeypad
-
-
-EndKeypad:
-		mov.b	Rx, R6
 		ret
+
 
 ;--------------------------------- END Check Keypad -----------------------------------
 ;-------------------------------------------------------------------------------
@@ -358,6 +353,13 @@ SetPattern0:
 		mov.w	#00000000b, SetPattern
 		mov.w	OutputA, Output
 		mov.w	#00h, Rx
+
+		mov.b	SetPattern, LastPattern
+
+		mov.b	#010h, R5
+		mov.b	#010h, R4
+		call	#LongDelay
+
 		ret
 
 SetPattern1:
@@ -407,33 +409,18 @@ SetPattern3:
 ResetPattern1:
 		mov.w	#00000000b, OutputB
 		mov.w	#00h, Rx
-
-
-		mov.b	#010h, R5
-		mov.b	#010h, R4
-		call	#LongDelay
 		ret
 
 
 ResetPattern2:
 		mov.w	#01111111b, OutputC
 		mov.w	#00h, Rx
-
-
-		mov.b	#010h, R5
-		mov.b	#010h, R4
-		call	#LongDelay
 		ret
 
 
 ResetPattern3:
 		mov.w	#00011000b, OutputD
 		mov.w	#00h, Rx
-
-
-		mov.b	#010h, R5
-		mov.b	#010h, R4
-		call	#LongDelay
 		ret
 
 
