@@ -10,7 +10,7 @@ int main(void)
 
 
 	UCB0CTLW0 |= UCMODE_3; //SELECT I2C
-    UCB0I2COA0 = 0x02;     //SLAVE ADDRESS
+    UCB0I2COA0 = 0x01;     //SLAVE ADDRESS
     UCB0CTLW0 &= ~UCMST;   //slave MODE
     UCB0CTLW0 &= ~UCTR;      //RECEIVE MODE
     //UCB0I2COA0 |= UCGCEN;   // general call response enable
@@ -57,7 +57,55 @@ int main(void)
 
 
     while(1){
+        if(Data == 0x0A){            //Pattern A
+            P1OUT |= BIT0;  //Set LED 1
+            P1OUT &= ~BIT1; //clear LED 2
+            P1OUT |= BIT4;  //Set LED 3
+            P1OUT &= ~BIT5; //clear LED 4
+            P1OUT |= BIT6;  //Set LED 5
+            P1OUT &= ~BIT7; //clear LED 6
+            P2OUT |= BIT6;  //Set LED 7
+            P2OUT &= ~BIT7; //clear LED 8
 
+        }
+        else if (Data == 0x0B){     //Pattern B
+            P1OUT &= ~BIT0; //clear LED 1
+            P1OUT &= ~BIT1; //clear LED 2
+            P1OUT &= ~BIT4; //clear LED 3
+            P1OUT &= ~BIT5; //clear LED 4
+            P1OUT &= ~BIT6; //clear LED 5
+            P1OUT &= ~BIT7; //clear LED 6
+            P2OUT &= ~BIT6; //clear LED 7
+            P2OUT &= ~BIT7; //clear LED 8
+            P1OUT |= BIT1;  //Set LED 2
+
+        }
+        else if (Data == 0x0C){    //Pattern C
+            P1OUT &= ~BIT0; //clear LED 1
+            P1OUT &= ~BIT1; //clear LED 2
+            P1OUT &= ~BIT4; //clear LED 3
+            P1OUT &= ~BIT5; //clear LED 4
+            P1OUT &= ~BIT6; //clear LED 5
+            P1OUT &= ~BIT7; //clear LED 6
+            P2OUT &= ~BIT6; //clear LED 7
+            P2OUT &= ~BIT7; //clear LED 8
+            P1OUT |= BIT4;  //Set LED 3
+
+        }
+        else if (Data == 0x0D){    //Pattern D
+            P1OUT &= ~BIT0; //clear LED 1
+            P1OUT &= ~BIT1; //clear LED 2
+            P1OUT &= ~BIT4; //clear LED 3
+            P1OUT &= ~BIT5; //clear LED 4
+            P1OUT &= ~BIT6; //clear LED 5
+            P1OUT &= ~BIT7; //clear LED 6
+            P2OUT &= ~BIT6; //clear LED 7
+            P2OUT &= ~BIT7; //clear LED 8
+            P1OUT |= BIT5;  //Set LED 4
+
+        }
+
+        /*
         P1OUT |= BIT0;  //Set LED 1
         P1OUT |= BIT1;  //Set LED 2
         P1OUT |= BIT4;  //Set LED 3
@@ -66,7 +114,7 @@ int main(void)
         P1OUT |= BIT7;  //Set LED 6
         P2OUT |= BIT6;  //Set LED 7
         P2OUT |= BIT7;  //Set LED 8
-
+    */
 
     }
 	return 0;
@@ -77,12 +125,9 @@ int main(void)
 #pragma vector = EUSCI_B0_VECTOR
 __interrupt void EUSCI_B0_I2C_ISR(void)
 {
-    Data = UCB0RXBUF;
-    /*
     UCB0IE &= ~UCRXIE0;
-    if(UCB0IE != '\0'){
+    if(UCB0RXBUF != '\0') {
         Data = UCB0RXBUF;
     }
     UCB0IE |= UCRXIE0;
-    */
 }
