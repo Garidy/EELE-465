@@ -1,6 +1,11 @@
 #include <msp430.h> 
 
+
 int Data;
+char count;
+char pattern1 = 127;
+char pattern2 = 24;
+void display(char pattern);
 
 int main(void)
 {
@@ -57,6 +62,10 @@ int main(void)
 
 
     while(1){
+        int i;
+        int temp;
+
+
         if(Data == 'A'){            //Pattern A
             P1OUT |= BIT0;  //Set LED 1
             P1OUT &= ~BIT1; //clear LED 2
@@ -69,39 +78,32 @@ int main(void)
 
         }
         else if (Data == 'B'){     //Pattern B
-            P1OUT &= ~BIT0; //clear LED 1
-            P1OUT &= ~BIT1; //clear LED 2
-            P1OUT &= ~BIT4; //clear LED 3
-            P1OUT &= ~BIT5; //clear LED 4
-            P1OUT &= ~BIT6; //clear LED 5
-            P1OUT &= ~BIT7; //clear LED 6
-            P2OUT &= ~BIT6; //clear LED 7
-            P2OUT &= ~BIT7; //clear LED 8
-            P1OUT |= BIT1;  //Set LED 2
+            count++;
+            display(count);
+
+            for(i=0; i<10000; i=i+1){}  //not 1s
 
         }
         else if (Data == 'C'){    //Pattern C
-            P1OUT &= ~BIT0; //clear LED 1
-            P1OUT &= ~BIT1; //clear LED 2
-            P1OUT &= ~BIT4; //clear LED 3
-            P1OUT &= ~BIT5; //clear LED 4
-            P1OUT &= ~BIT6; //clear LED 5
-            P1OUT &= ~BIT7; //clear LED 6
-            P2OUT &= ~BIT6; //clear LED 7
-            P2OUT &= ~BIT7; //clear LED 8
-            P1OUT |= BIT4;  //Set LED 3
+            pattern1 = (pattern1 << 1) | (pattern1 >> (8 - 1));
+            display(pattern1);
+            for(i=0; i<10000; i=i+1){}  //not 1s
+
 
         }
         else if (Data == 'D'){    //Pattern D
-            P1OUT &= ~BIT0; //clear LED 1
-            P1OUT &= ~BIT1; //clear LED 2
-            P1OUT &= ~BIT4; //clear LED 3
-            P1OUT &= ~BIT5; //clear LED 4
-            P1OUT &= ~BIT6; //clear LED 5
-            P1OUT &= ~BIT7; //clear LED 6
-            P2OUT &= ~BIT6; //clear LED 7
-            P2OUT &= ~BIT7; //clear LED 8
-            P1OUT |= BIT5;  //Set LED 4
+            temp++;
+            if(((temp % 7) == 0) || ((temp % 7) == 6)){
+                pattern2 = 24;
+            }else if(((temp % 7) == 2) || ((temp % 7) == 5)){
+                pattern2 = 36;
+            }else if(((temp % 7) == 2) || ((temp % 7) == 4)){
+                pattern2 = 66;
+            }else if(((temp % 7) == 3)){
+                pattern2 = 129;
+            }
+            display(pattern2);
+            for(i=0; i<10000; i=i+1){}  //not 1s
 
         }
 
@@ -119,6 +121,57 @@ int main(void)
     }
 	return 0;
 }
+
+void display(char pattern){
+    if(pattern & BIT0){
+        P1OUT |= BIT0;  //Set LED 1
+    }else{
+        P1OUT &= ~BIT0;  //clear LED 1
+    }
+
+    if(pattern & BIT1){
+        P1OUT |= BIT1;  //Set LED 2
+    }else{
+        P1OUT &= ~BIT1; //clear LED 2
+    }
+
+    if(pattern & BIT2){
+        P1OUT |= BIT4;  //Set LED 3
+    }else{
+        P1OUT &= ~BIT4; //clear LED 3
+    }
+
+    if(pattern & BIT3){
+        P1OUT |= BIT5;  //Set LED 4
+    }else{
+        P1OUT &= ~BIT5; //clear LED 4
+    }
+
+    if(pattern & BIT4){
+        P1OUT |= BIT6;  //Set LED 5
+    }else{
+        P1OUT &= ~BIT6; //clear LED 5
+    }
+
+    if(pattern & BIT5){
+        P1OUT |= BIT7;  //Set LED 6
+    }else{
+        P1OUT &= ~BIT7; //clear LED 6
+    }
+
+    if(pattern & BIT6){
+        P2OUT |= BIT6;  //Set LED 7
+    }else{
+        P2OUT &= ~BIT6; //clear LED 7
+    }
+
+    if(pattern & BIT7){
+        P2OUT |= BIT7;  //Set LED 8
+    }else{
+        P2OUT &= ~BIT7; //clear LED 8
+    }
+}
+
 
 //--------------------------------------------
 //--ISRs

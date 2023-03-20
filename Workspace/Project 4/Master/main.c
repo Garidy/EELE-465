@@ -68,7 +68,7 @@ int main(void)
 
     while(1){
         P5OUT |= BIT3;
-
+        WDTCTL = WDTPW | WDTHOLD;
         keypad = checkKeypad();
 
         if(keypad != 0x00){
