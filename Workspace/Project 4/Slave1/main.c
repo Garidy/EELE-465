@@ -57,7 +57,7 @@ int main(void)
 
 
     while(1){
-        if(Data == 0x0A){            //Pattern A
+        if(Data == 'A'){            //Pattern A
             P1OUT |= BIT0;  //Set LED 1
             P1OUT &= ~BIT1; //clear LED 2
             P1OUT |= BIT4;  //Set LED 3
@@ -68,7 +68,7 @@ int main(void)
             P2OUT &= ~BIT7; //clear LED 8
 
         }
-        else if (Data == 0x0B){     //Pattern B
+        else if (Data == 'B'){     //Pattern B
             P1OUT &= ~BIT0; //clear LED 1
             P1OUT &= ~BIT1; //clear LED 2
             P1OUT &= ~BIT4; //clear LED 3
@@ -80,7 +80,7 @@ int main(void)
             P1OUT |= BIT1;  //Set LED 2
 
         }
-        else if (Data == 0x0C){    //Pattern C
+        else if (Data == 'C'){    //Pattern C
             P1OUT &= ~BIT0; //clear LED 1
             P1OUT &= ~BIT1; //clear LED 2
             P1OUT &= ~BIT4; //clear LED 3
@@ -92,7 +92,7 @@ int main(void)
             P1OUT |= BIT4;  //Set LED 3
 
         }
-        else if (Data == 0x0D){    //Pattern D
+        else if (Data == 'D'){    //Pattern D
             P1OUT &= ~BIT0; //clear LED 1
             P1OUT &= ~BIT1; //clear LED 2
             P1OUT &= ~BIT4; //clear LED 3

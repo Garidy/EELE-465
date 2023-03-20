@@ -68,12 +68,13 @@ int main(void)
 
     while(1){
         P5OUT |= BIT3;
+
         keypad = checkKeypad();
 
-        UCB0CTLW0 |= UCTXSTT;   //manually start
-        for(i=0; i<100; i=i+1){}
-
-
+        if(keypad != 0x00){
+            UCB0CTLW0 |= UCTXSTT;   //manually start
+            for(i=0; i<100; i=i+1){}
+        }
     }
     return 0;
 
@@ -255,7 +256,7 @@ char getChar(char buttonPressed){
 __interrupt void EUSCI_B0_I2C_ISR(void)
 {
 
-    UCB0TXBUF = 0x0A;
+    UCB0TXBUF = keypad;
 
 
 }
