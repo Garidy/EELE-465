@@ -9,12 +9,34 @@
 
 //int j;
 //int Delay;
+int Data;
+int prevInput;
 
 
 
 int main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
+    UCB0CTLW0 |= UCSWRST; //RESET
+
+
+    UCB0CTLW0 |= UCMODE_3; //SELECT I2C
+    UCB0I2COA0 = 0x02;     //SLAVE ADDRESS
+    UCB0CTLW0 &= ~UCMST;   //slave MODE
+    UCB0CTLW0 &= ~UCTR;      //RECEIVE MODE
+    //UCB0I2COA0 |= UCGCEN;   // general call response enable
+    UCB0I2COA0 |= UCOAEN;   // slave address enable
+
+    UCB0CTLW0 &= ~UCTR;      //RECEIVE MODE
+    UCB0CTLW1 &= ~UCSWACK;  // auto acknowledge
+    UCB0TBCNT = 0x01;      // Length of Receiving data
+
+    //UCB0CTLW1 &= ~UCTXIFG0;
+    P1SEL1 &= ~BIT3;    //P1.3 = SCL
+    P1SEL0 |= BIT3;
+
+    P1SEL1 &= ~BIT2;     //P1.2 = SDA
+    P1SEL0 |= BIT2;
 
     //---------------------- ADC Setup -------------------------------
     //-- Configure Ports
@@ -28,30 +50,11 @@ int main(void)
 
     PM5CTL0 &= ~LOCKLPM5;   // turn on GPIO
 
+    UCB0CTLW0 &= ~UCSWRST;              // OUT OF RESET
 
-    //-------------------------------------------------------
-/*
-    // Setup eUSCI_B0-------------------------------------------------------
-    UCB0CTLW0 |= UCSWRST;
-    UCB0CTLW0 |= UCSSEL_3;
-    UCB0BRW = 10;
-    UCB0CTLW0 |= UCMODE_3;
-    UCB0CTLW0 |= UCMST;
-    UCB0CTLW0 |= UCTR;
-    UCB0I2CSA = 0x0068;
-    UCB0CTLW1 |= UCASTP_2;
-    UCB0TBCNT = sizeof(Packet);
-*/
-/*
-    //Take eUSCI_A1 out of SW reset
-    UCA1CTLW0 &= ~UCSWRST;
+    UCB0IE |= UCRXIE0;                  //ENABLE I2C RX IRQ
 
-    // Enable Interrupts----------------------------------------------------
-    UCB0IE |= UCRXIE0;
-    UCB0IE |= UCTXIE0;
-    UCA1IE |= UCRXIE;
-*/
-//    __enable_interrupt();   // enable maskable IRQs
+    __enable_interrupt();
 
     LcdInit();  //initialize LCD
 
@@ -59,14 +62,10 @@ int main(void)
     while(1)
     {
 
-        KeyEntered('A');
         Delay(10000);
-        KeyEntered('B');
-        Delay(10000);
+       // KeyEntered('B');
+       // Delay(10000);
 
-        while(1){
-            //loop
-        }
 
 
 }
@@ -76,6 +75,19 @@ int main(void)
 }
 
 //-- Interrupt Service Routines -------------------------------
+//--------------------------------------------
+#pragma vector = EUSCI_B0_VECTOR
+__interrupt void EUSCI_B0_I2C_ISR(void)
+{
+    UCB0IE &= ~UCRXIE0;
+    if(UCB0RXBUF != '\0') {
+        //prevInput = Data;
+        //Data = UCB0RXBUF;
+        KeyEntered(UCB0RXBUF);
+
+    }
+    UCB0IE |= UCRXIE0;
+}
 
 
 

@@ -1,9 +1,9 @@
 #include <msp430.h> 
 
 char keypad;
+char prevInput;
 
 char checkKeypad(void);
-char getChag(char button);
 int main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
@@ -16,7 +16,6 @@ int main(void)
     UCB0CTLW0 |= UCMODE_3;  // put into I2C mode
     UCB0CTLW0 |= UCMST;     // set as master
     UCB0CTLW0 |= UCTR;      // default Tx mode
-    UCB0I2CSA = 0x01;       // set slave address
 
     UCB0CTLW1 |= UCASTP_2;   // auto STOP mode
     UCB0TBCNT |= 1;         // count = 1 byte
@@ -68,13 +67,19 @@ int main(void)
 
     while(1){
         P5OUT |= BIT3;
+
         WDTCTL = WDTPW | WDTHOLD;
         keypad = checkKeypad();
 
-        if(keypad != 0x00){
+
+        if(keypad != 0x00 && keypad != prevInput){
+            UCB0I2CSA = 0x02;       // set slave address
             UCB0CTLW0 |= UCTXSTT;   //manually start
+
             for(i=0; i<100; i=i+1){}
         }
+
+        prevInput = keypad;
     }
     return 0;
 
@@ -185,67 +190,62 @@ char checkKeypad(void) {
         return 0x00;
     };
 
-    return getChar(buttonPressed);
-
-}
-
-char getChar(char buttonPressed){
     char button = 0x00;
 
-        switch(buttonPressed) {
-            case 0x11:
-                button = '1';
-                break;
-            case 0x12:
-                button = '2';
-                break;
-            case 0x14:
-                button = '3';
-                break;
-            case 0x18:
-                button = 'A';
-                break;
+    switch(buttonPressed) {
+        case 0x11:
+            button = '1';
+            break;
+        case 0x12:
+            button = '2';
+            break;
+        case 0x14:
+            button = '3';
+            break;
+        case 0x18:
+            button = 'A';
+            break;
 
-            case 0x21:
-                button = '4';
-                break;
-            case 0x22:
-                button = '5';
-                break;
-            case 0x24:
-                button = '6';
-                break;
-            case 0x28:
-                button = 'B';
-                break;
+        case 0x21:
+            button = '4';
+            break;
+        case 0x22:
+            button = '5';
+            break;
+        case 0x24:
+            button = '6';
+            break;
+        case 0x28:
+            button = 'B';
+            break;
 
-            case 0x41:
-                button = '7';
-                break;
-            case 0x42:
-                button = '8';
-                break;
-            case 0x44:
-                button = '9';
-                break;
-            case 0x48:
-                button = 'C';
-                break;
+        case 0x41:
+            button = '7';
+            break;
+        case 0x42:
+            button = '8';
+            break;
+        case 0x44:
+            button = '9';
+            break;
+        case 0x48:
+            button = 'C';
+            break;
 
-            case 0x81:
-                button = '*';
-                break;
-            case 0x82:
-                button = '0';
-                break;
-            case 0x84:
-                button = '#';
-                break;
-            case 0x88:
-                button = 'D';
-                break;
-        }
-        return button;
+        case 0x81:
+            button = '*';
+            break;
+        case 0x82:
+            button = '0';
+            break;
+        case 0x84:
+            button = '#';
+            break;
+        case 0x88:
+            button = 'D';
+            break;
+    }
+    return button;
 
 }
 

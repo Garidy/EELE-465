@@ -144,7 +144,7 @@ void Row4(){
 }
 
 void Row5(){
-    BitSet(0,0,1,0,1);
+    BitSet(1,0,1,0,1);
 }
 
 void Row6(){
@@ -205,8 +205,8 @@ void KeyEntered(char c) {
     case '5': Column3();
             Row5();
             break;
-    case '6': Column3();
-            Row6();
+    case '6':
+            CursorPos = 31;
             break;
     case '7': Column3();
             Row7();

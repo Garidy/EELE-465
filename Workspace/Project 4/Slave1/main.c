@@ -2,9 +2,15 @@
 
 
 int Data;
+int prevInput;
+int i;
+
+int flag = 0;
+
 char count;
 char pattern1 = 127;
 char pattern2 = 24;
+
 void display(char pattern);
 
 int main(void)
@@ -15,7 +21,7 @@ int main(void)
 
 
 	UCB0CTLW0 |= UCMODE_3; //SELECT I2C
-    UCB0I2COA0 = 0x01;     //SLAVE ADDRESS
+    UCB0I2COA0 = 0x02;     //SLAVE ADDRESS
     UCB0CTLW0 &= ~UCMST;   //slave MODE
     UCB0CTLW0 &= ~UCTR;      //RECEIVE MODE
     //UCB0I2COA0 |= UCGCEN;   // general call response enable
@@ -62,11 +68,12 @@ int main(void)
 
 
     while(1){
-        int i;
         int temp;
 
 
         if(Data == 'A'){            //Pattern A
+            display(170);
+            /*
             P1OUT |= BIT0;  //Set LED 1
             P1OUT &= ~BIT1; //clear LED 2
             P1OUT |= BIT4;  //Set LED 3
@@ -75,37 +82,49 @@ int main(void)
             P1OUT &= ~BIT7; //clear LED 6
             P2OUT |= BIT6;  //Set LED 7
             P2OUT &= ~BIT7; //clear LED 8
+            */
 
         }
         else if (Data == 'B'){     //Pattern B
+            for(i=0; i<30000; i=i+1){}  //not 1s
+            for(i=0; i<30000; i=i+1){}  //not 1s
+            for(i=0; i<30000; i=i+1){}  //not 1s
+
+            if(flag){
+                count = 0;
+                flag = 0;
+            }
             count++;
             display(count);
 
-            for(i=0; i<10000; i=i+1){}  //not 1s
 
         }
         else if (Data == 'C'){    //Pattern C
             pattern1 = (pattern1 << 1) | (pattern1 >> (8 - 1));
             display(pattern1);
-            for(i=0; i<10000; i=i+1){}  //not 1s
-
+            for(i=0; i<30000; i=i+1){}  //not 1s
+            for(i=0; i<30000; i=i+1){}  //not 1s
+            for(i=0; i<30000; i=i+1){}  //not 1s
 
         }
         else if (Data == 'D'){    //Pattern D
             temp++;
-            if(((temp % 7) == 0) || ((temp % 7) == 6)){
+            if(((temp % 6) == 0)){
                 pattern2 = 24;
-            }else if(((temp % 7) == 2) || ((temp % 7) == 5)){
+            }else if(((temp % 6) == 1) || ((temp % 6) == 5)){
                 pattern2 = 36;
-            }else if(((temp % 7) == 2) || ((temp % 7) == 4)){
+            }else if(((temp % 6) == 2) || ((temp % 6) == 4)){
                 pattern2 = 66;
-            }else if(((temp % 7) == 3)){
+            }else if(((temp % 6) == 3)){
                 pattern2 = 129;
             }
             display(pattern2);
-            for(i=0; i<10000; i=i+1){}  //not 1s
-
+            for(i=0; i<15000; i=i+1){}  //not 1s
+            for(i=0; i<30000; i=i+1){}  //not 1s
+        }else{
+            display(0);
         }
+
 
         /*
         P1OUT |= BIT0;  //Set LED 1
@@ -178,8 +197,10 @@ void display(char pattern){
 #pragma vector = EUSCI_B0_VECTOR
 __interrupt void EUSCI_B0_I2C_ISR(void)
 {
+    flag = 1;
     UCB0IE &= ~UCRXIE0;
-    if(UCB0RXBUF != '\0') {
+    if(UCB0RXBUF != '\0' && prevInput != UCB0RXBUF) {
+        prevInput = Data;
         Data = UCB0RXBUF;
     }
     UCB0IE |= UCRXIE0;
