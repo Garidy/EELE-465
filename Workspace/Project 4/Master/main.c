@@ -27,9 +27,33 @@ int main(void)
     P1SEL1 &= ~BIT2;   //P1.2 SDA (1)
     P1SEL0 |= BIT2;
 
+    //Timer
+    TB0CTL |= TBCLR;        //clear timers and dividers
+    TB0CTL |= TBSSEL__ACLK; //ACLK
+    TB0CTL |= MC__UP;       //count to value in TB0CCR0
+    TB0CTL |= CNTL_1;       //12bit
+    TB0CTL |= ID__8;        //divide by 8
+
+    TB0CCR0 = 0x555;        //1/3s
+    T0CCTL0 &= ~CCIFG;      //clear flag
+
+    //Setup ADC
+    P5SEL1 |= BIT0;         //P5.0 (#43)
+    P5SEL0 |= BIT0;
 
     PM5CTL0 &= ~LOCKLPM5;
     UCB0CTLW0 &= ~UCSWRST;   // take B0 out of SW RST
+
+    //Config ADC
+    ADCCTL0 &= ~ADCSHT;     //clear ADSHT from def. of ADCSHT=01
+    ADCCTL0 |= ADCSHT_2;    //16 cycles;
+    ADCCTL0 |= ADCON;       //ADC on
+
+    ADCCTL1 |= ADCSSEL_2;   //ADC clock = SMCLK
+    ADCCTL1 |= ADCSHP;      //sample source = sample timer
+    ADCCTL2 &= ~ADCRES;     //clear ADCRES from def. of ADCRES=01
+    ADCCTL2 |= ADCRES_1;    //12bit resolution
+    ADCMCTL0 |= ADCINCH_???;  //ADC input channel =
 
 
     P5DIR |= BIT3;
@@ -37,6 +61,7 @@ int main(void)
 
     //enable B0 TX0 IRQ
     UCB0IE |= UCTXIE0;  //local enable for TX0
+    TB0CCTL0 |= CCIE;   //local enable for timer
     //UCB0IE |= UCRXIE0;  // Rx
     __enable_interrupt();   //enable maskables
 
