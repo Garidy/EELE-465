@@ -1,7 +1,13 @@
 #include <msp430.h> 
+#include <math.h>
 
 char keypad;
 char prevInput;
+
+float ADCvalue;
+float tempC;
+float tempK;
+float vOut;
 
 char checkKeypad(void);
 int main(void)
@@ -27,6 +33,7 @@ int main(void)
     P1SEL1 &= ~BIT2;   //P1.2 SDA (1)
     P1SEL0 |= BIT2;
 
+    /*
     //Timer
     TB0CTL |= TBCLR;        //clear timers and dividers
     TB0CTL |= TBSSEL__ACLK; //ACLK
@@ -36,7 +43,7 @@ int main(void)
 
     TB0CCR0 = 0x555;        //1/3s
     T0CCTL0 &= ~CCIFG;      //clear flag
-
+    */
     //Setup ADC
     P5SEL1 |= BIT0;         //P5.0 (#43)
     P5SEL0 |= BIT0;
@@ -52,9 +59,10 @@ int main(void)
     ADCCTL1 |= ADCSSEL_2;   //ADC clock = SMCLK
     ADCCTL1 |= ADCSHP;      //sample source = sample timer
     ADCCTL2 &= ~ADCRES;     //clear ADCRES from def. of ADCRES=01
-    ADCCTL2 |= ADCRES_1;    //12bit resolution
-    ADCMCTL0 |= ADCINCH_???;  //ADC input channel =
+    ADCCTL2 |= ADCRES_1;    //10bit resolution
+    ADCMCTL0 |= ADCINCH_8;  //ADC input channel = A8
 
+    ADCIE |= ADCIE0;
 
     P5DIR |= BIT3;
     P5OUT &= ~BIT3;
@@ -68,6 +76,7 @@ int main(void)
 
 
     int i;
+    /*
     int unlockStatus = 0;
 
 
@@ -88,12 +97,12 @@ int main(void)
         }
 
     }
-
+    */
 
     while(1){
-        P5OUT |= BIT3;
 
-        WDTCTL = WDTPW | WDTHOLD;
+        ADCCTL0 |= ADCENC | ADCSC;      //Enable and Start conversion
+        //WDTCTL = WDTPW | WDTHOLD;
         keypad = checkKeypad();
 
 
@@ -105,10 +114,19 @@ int main(void)
         }
 
         prevInput = keypad;
+
     }
     return 0;
 
 }
+
+void ADCtoTemp(float ADCvalue){
+    vOut = 3.3*(ADCvalue/1024);
+    tempC = (sqrtf((2196200)+((1.8639-vOut)/(0.00000388))) - 1481.96);
+    tempK = tempC + 273;
+}
+
+
 
 char checkKeypad(void) {
     char buttonPressed = 0x00;      //init 0
@@ -283,6 +301,15 @@ __interrupt void EUSCI_B0_I2C_ISR(void)
 
     UCB0TXBUF = keypad;
 
+}
+
+#pragma vector = ADC_VECTOR
+__interrupt void ADC_ISR(void){
+
+    P5OUT |= BIT3;
+
+    ADCvalue = ADCMEM0;
+    ADCtoTemp(ADCvalue);
 
 }
 
