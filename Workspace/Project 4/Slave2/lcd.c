@@ -1,6 +1,6 @@
 #include "lcd.h"
 
-int CursorPos = 0;
+//int CursorPos = 0;
 int i;
 
 void Delay(int D){
@@ -10,64 +10,44 @@ void Delay(int D){
 }
 
 void Latch(){
-    Delay(800);
+    Delay(50);
     P2OUT |= BIT6;  // Latch
-    Delay(800);
+    Delay(50);
     P2OUT &= ~BIT6;
-    Delay(800);
+    Delay(50);
 }
 
-void BitSet(int RS, int DB7, int DB6, int DB5, int DB4){
+void BitSet(int RS, char data){
     Delay(800);
+    P2OUT &= ~(BIT7); //clear RS
+    P1OUT &= ~(BIT7); //clear 7
+    P1OUT &= ~(BIT6); //clear 6
+    P1OUT &= ~(BIT5); //clear 5
+    P1OUT &= ~(BIT4); //clear 4
     if(RS == 1){
         P2OUT |= (BIT7); //set RS
     }
-    else{
-        P2OUT &= ~(BIT7); //clear RS
-    }
 
-    if(DB7){
-        P1OUT |= (BIT7); //set 7
-    }
-    else{
-        P1OUT &= ~(BIT7); //clear 7
-    }
-    if(DB6){
-        P1OUT |= (BIT6); //set 6
-    }
-    else{
-        P1OUT &= ~(BIT6); //clear 6
-    }
-    if(DB5){
-        P1OUT |= (BIT5); //set 5
-    }
-    else{
-        P1OUT &= ~(BIT5); //clear 5
-    }
-    if(DB4){
-        P1OUT |= (BIT4); //set 4
-    }
-    else{
-        P1OUT &= ~(BIT4); //clear 4
-    }
+    P1OUT |= (data << 4);
+
     Latch();
 }
 
 void FunctionSet(void){
-    BitSet(0,0,0,1,1);
+    BitSet(0,0x03);
 }
 
 void FunctionSet4Bit(void){
-    BitSet(0,0,0,1,0);
+    BitSet(0,0x02);
 }
 
 void ClearDisplay(void){
-    BitSet(0,0,0,0,0);
-    BitSet(0,0,0,0,1);
+    BitSet(0,0x00);
+    BitSet(0,0x01);
 }
 
 void ClearAll(void){
-    BitSet(0,0,0,0,0);
+    BitSet(0,0x00);
 }
 
 void LcdInit(void){
@@ -83,13 +63,13 @@ void LcdInit(void){
     FunctionSet4Bit();
 
 //block 6
-    BitSet(0,1,1,0,0);
+    BitSet(0,0x0C);
 
 //block 7
     ClearAll();
 
 //block 8
-    BitSet(0,1,0,0,0);
+    BitSet(0,0x08);
 
 // block 9-10
     ClearDisplay();
@@ -98,73 +78,153 @@ void LcdInit(void){
     ClearAll();
 
 //block 12
-    BitSet(0,0,1,1,0);
+    BitSet(0,0x06);
     Delay(800);
 
 //turn on LCD
     ClearAll();
-    BitSet(0,1,1,0,0);
+    BitSet(0,0x0C);
     Delay(800);
 }
 // END INIT
 
+void LcdTempInit(void){
+    ClearDisplay();
+
+    //set cursor pos to 0
+    BitSet(0,0x08);
+    BitSet(0,0x00);
+
+    //E
+    BitSet(1,0x04);
+    BitSet(1,0x05);
+
+    //n
+    BitSet(1,0x06);
+    BitSet(1,0x0E);
+
+    //t
+    BitSet(1,0x07);
+    BitSet(1,0x04);
+
+    //e
+    BitSet(1,0x06);
+    BitSet(1,0x05);
+
+    //r
+    BitSet(1,0x07);
+    BitSet(1,0x02);
+
+    //set pos to 06
+    BitSet(0,0x08);
+    BitSet(0,0x06);
+
+    //n
+    BitSet(1,0x06);
+    BitSet(1,0x0E);
+
+    //:
+    BitSet(1,0x03);
+    BitSet(1,0x0A);
+
+    //set pos to 40
+    BitSet(0,0x0C);
+    BitSet(0,0x00);
+
+    //T
+    BitSet(1,0x05);
+    BitSet(1,0x04);
+
+    //set pos to 42
+    BitSet(0,0x0C);
+    BitSet(0,0x02);
+
+    //=
+    BitSet(1,0x03);
+    BitSet(1,0x0D);
+
+    //set pos to 47
+    BitSet(0,0x0C);
+    BitSet(0,0x07);
+
+    //degree
+    BitSet(1,0x0D);
+    BitSet(1,0x0F);
+
+    //K
+    BitSet(1,0x04);
+    BitSet(1,0x0B);
+
+    //set pos to 4E
+    BitSet(0,0x0C);
+    BitSet(0,0x0E);
+
+    //degree
+    BitSet(1,0x0D);
+    BitSet(1,0x0F);
+
+    //C
+    BitSet(1,0x04);
+    BitSet(1,0x03);
+
+}
 
 //ROWS AND COLUMNS ------------------------------------------------------------
 
 void Column2(){
-    BitSet(1,0,0,1,0);
+    BitSet(1,0x02);
 }
 
 void Column3(){
-    BitSet(1,0,0,1,1);
+    BitSet(1,0x03);
 }
 
 void Column4(){
-    BitSet(1,0,1,0,0);
+    BitSet(1,0x04);
 }
 
 void Row0(){
-    BitSet(1,0,0,0,0);
+    BitSet(1,0x00);
 }
 
 void Row1(){
-    BitSet(1,0,0,0,1);
+    BitSet(1,0x01);
 }
 
 void Row2(){
-    BitSet(1,0,0,1,0);
+    BitSet(1,0x02);
 }
 
 void Row3(){
-    BitSet(1,0,0,1,1);
+    BitSet(1,0x03);
 }
 
 void Row4(){
-    BitSet(1,0,1,0,0);
+    BitSet(1,0x04);
 }
 
 void Row5(){
-    BitSet(1,0,1,0,1);
+    BitSet(1,0x05);
 }
 
 void Row6(){
-    BitSet(1,0,1,1,0);
+    BitSet(1,0x06);
 }
 
 void Row7(){
-    BitSet(1,0,1,1,1);
+    BitSet(1,0x07);
 }
 
 void Row8(){
-    BitSet(1,1,0,0,0);
+    BitSet(1,0x08);
 }
 
 void Row9(){
-    BitSet(1,1,0,0,1);
+    BitSet(1,0x09);
 }
 
 void Row10(){
-    BitSet(1,1,0,1,0);
+    BitSet(1,0x0A);
 }
 
 
@@ -175,7 +235,7 @@ void KeyEntered(char c) {
     //Print entered char
     switch(c)
     {
-    case 'A': Column4();
+/*    case 'A': Column4();
             Row1();
             break;
     case 'B': Column4();
@@ -186,7 +246,7 @@ void KeyEntered(char c) {
             break;
     case 'D': Column4();
             Row4();
-            break;
+            break; */
     case '0': Column3();
             Row0();
             break;
@@ -206,7 +266,8 @@ void KeyEntered(char c) {
             Row5();
             break;
     case '6':
-            CursorPos = 31;
+            Column3();
+            Row6();
             break;
     case '7': Column3();
             Row7();
@@ -217,33 +278,28 @@ void KeyEntered(char c) {
     case '9': Column3();
             Row9();
             break;
-    case '*': Column2();
-            Row10();
-            break;
-    case '#': Column2();
-            Row3();
+    case 'A': LcdTempInit();
             break;
     default: Column4();
             Row1();
             break;
     }
 
-    // cursor moves to next pos, check for 0F/4F condition
+ /*   // cursor moves to next pos, check for 0F/4F condition
     CursorPos++;
     if (CursorPos == 16) {      //Cursor moved past 0F
-        BitSet(0,1,1,0,0);
+        BitSet(0,0x0A);
         ClearAll();
         Delay(800);
     }
     else if (CursorPos == 32) { //cursor moved to end position, clear screen and reset cursor
         CursorPos = 0;
-        BitSet(0,1,0,0,0);
+        BitSet(0,0x08);
         ClearAll();
         Delay(800);
 
     //clear display
         ClearDisplay();
-    }
+    } */
 
 } //-------------- END KeyEntered ------------------------------------
-

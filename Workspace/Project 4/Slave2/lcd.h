@@ -1,16 +1,17 @@
-#include <msp430.h>
+#include <msp430fr2310.h>
 #ifndef LCD_H_   /* Include guard */
 #define LCD_H_
 
 
 
 void LcdInit(void);
+void LcdTempInit(void);
 void Latch();
 void FunctionSet(void);
 void FunctionSet4Bit(void);
 void ClearDisplay(void);
 void ClearAll(void);
-void BitSet(int RS, int DB7, int DB6, int DB5, int DB4);
+void BitSet(int RS, char data);
 
 void Delay(int D);
 

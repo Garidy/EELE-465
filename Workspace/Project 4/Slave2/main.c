@@ -4,13 +4,15 @@
  *     2 March 2023
  */
 
-#include <msp430.h> 
+#include <msp430.h>
 #include "lcd.h"
 
 //int j;
 //int Delay;
 int Data;
 int prevInput;
+int KeyPressFlag;
+int DataPos = 0;
 
 
 
@@ -57,15 +59,11 @@ int main(void)
     __enable_interrupt();
 
     LcdInit();  //initialize LCD
+    LcdTempInit();
 
     //-- Main Loop
     while(1)
     {
-
-        Delay(10000);
-       // KeyEntered('B');
-       // Delay(10000);
-
 
 
 }
@@ -83,8 +81,39 @@ __interrupt void EUSCI_B0_I2C_ISR(void)
     if(UCB0RXBUF != '\0') {
         //prevInput = Data;
         //Data = UCB0RXBUF;
-        KeyEntered(UCB0RXBUF);
 
+        Data = UCB0RXBUF;
+        DataPos++;
+
+    }
+    if (DataPos == 1){
+        //set pos to 08
+        BitSet(0,0x08);
+        BitSet(0,0x08);
+        KeyEntered(Data);
+        //set pos to 44
+        BitSet(0,0x0C);
+        BitSet(0,0x04);
+    }
+    if (DataPos > 1 && DataPos < 5){
+        KeyEntered(Data);
+    }
+    if (DataPos == 4){
+        //set pos to 4A
+        BitSet(0,0x0C);
+        BitSet(0,0x0A);
+    }
+    if (DataPos > 5){
+        //set pos to 4A
+        KeyEntered(Data);
+    }
+    if (DataPos == 6){
+        //decimal
+       BitSet(1,0x02);
+       BitSet(1,0x0E);
+    }
+    if (DataPos == 7){
+        DataPos = 0;
     }
     UCB0IE |= UCRXIE0;
 }

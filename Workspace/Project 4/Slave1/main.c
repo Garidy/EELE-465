@@ -21,7 +21,7 @@ int main(void)
 
 
 	UCB0CTLW0 |= UCMODE_3; //SELECT I2C
-    UCB0I2COA0 = 0x02;     //SLAVE ADDRESS
+    UCB0I2COA0 = 0x01;     //SLAVE ADDRESS
     UCB0CTLW0 &= ~UCMST;   //slave MODE
     UCB0CTLW0 &= ~UCTR;      //RECEIVE MODE
     //UCB0I2COA0 |= UCGCEN;   // general call response enable
