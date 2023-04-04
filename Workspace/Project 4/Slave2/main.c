@@ -10,9 +10,8 @@
 //int j;
 //int Delay;
 int Data;
-int prevInput;
-int KeyPressFlag;
 int DataPos = 0;
+int Dataflag = 0;
 
 
 
@@ -64,7 +63,54 @@ int main(void)
     //-- Main Loop
     while(1)
     {
-
+        if (Dataflag == 1) {
+            if (DataPos == 1){
+                //set pos to 04
+                BitSet(0,0x08);
+                BitSet(0,0x04);
+                KeyEntered(Data);
+                //set pos to 0A
+                BitSet(0,0x08);
+                BitSet(0,0x0A);
+            }
+            if (DataPos > 1 && DataPos < 4){
+                KeyEntered(Data);
+            }
+            if (DataPos == 4){
+                //decimal
+                BitSet(1,0x02);
+                BitSet(1,0x0E);
+                KeyEntered(Data);
+                //set pos to 40
+                BitSet(0,0x0C);
+                BitSet(0,0x00);
+            }
+            if (DataPos == 5){
+                KeyEntered(Data);
+                //set pos to 42
+                 BitSet(0,0x0C);
+                 BitSet(0,0x02);
+            }
+            if (DataPos > 5 && DataPos < 9){
+                KeyEntered(Data);
+            }
+            if (DataPos == 9){
+                //set pos to 4A
+                 BitSet(0,0x0C);
+                 BitSet(0,0x0A);
+            }
+            if (DataPos > 8 && DataPos < 11){
+                KeyEntered(Data);
+            }
+            if (DataPos == 11){
+                //decimal
+                BitSet(1,0x02);
+                BitSet(1,0x0E);
+                KeyEntered(Data);
+                DataPos = 0;
+            }
+            Dataflag = 0;
+        }
 
 }
 
@@ -83,37 +129,16 @@ __interrupt void EUSCI_B0_I2C_ISR(void)
         //Data = UCB0RXBUF;
 
         Data = UCB0RXBUF;
-        DataPos++;
 
-    }
-    if (DataPos == 1){
-        //set pos to 08
-        BitSet(0,0x08);
-        BitSet(0,0x08);
-        KeyEntered(Data);
-        //set pos to 44
-        BitSet(0,0x0C);
-        BitSet(0,0x04);
-    }
-    if (DataPos > 1 && DataPos < 5){
-        KeyEntered(Data);
-    }
-    if (DataPos == 4){
-        //set pos to 4A
-        BitSet(0,0x0C);
-        BitSet(0,0x0A);
-    }
-    if (DataPos > 5){
-        //set pos to 4A
-        KeyEntered(Data);
-    }
-    if (DataPos == 6){
-        //decimal
-       BitSet(1,0x02);
-       BitSet(1,0x0E);
-    }
-    if (DataPos == 7){
-        DataPos = 0;
+        DataPos++;
+        if (Data != '%'){
+            Dataflag = 1;
+        }
+        else {
+            DataPos = 0;
+//            LcdTempInit();
+        }
+
     }
     UCB0IE |= UCRXIE0;
 }
