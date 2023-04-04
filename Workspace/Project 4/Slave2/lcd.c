@@ -10,15 +10,15 @@ void Delay(int D){
 }
 
 void Latch(){
-    Delay(50);
+    Delay(5);
     P2OUT |= BIT6;  // Latch
-    Delay(50);
+    Delay(5);
     P2OUT &= ~BIT6;
-    Delay(50);
+    Delay(5);
 }
 
 void BitSet(int RS, char data){
-    Delay(800);
+    Delay(200);
     P2OUT &= ~(BIT7); //clear RS
     P1OUT &= ~(BIT7); //clear 7
     P1OUT &= ~(BIT6); //clear 6
@@ -95,65 +95,65 @@ void LcdTempInit(void){
     BitSet(0,0x08);
     BitSet(0,0x00);
 
-    //E
-    BitSet(1,0x04);
+    //R
     BitSet(1,0x05);
-
-    //n
-    BitSet(1,0x06);
-    BitSet(1,0x0E);
-
-    //t
-    BitSet(1,0x07);
-    BitSet(1,0x04);
+    BitSet(1,0x02);
 
     //e
     BitSet(1,0x06);
     BitSet(1,0x05);
 
-    //r
+    //s
     BitSet(1,0x07);
-    BitSet(1,0x02);
-
-    //set pos to 06
-    BitSet(0,0x08);
-    BitSet(0,0x06);
-
-    //n
-    BitSet(1,0x06);
-    BitSet(1,0x0E);
-
-    //:
     BitSet(1,0x03);
-    BitSet(1,0x0A);
-
-    //set pos to 40
-    BitSet(0,0x0C);
-    BitSet(0,0x00);
-
-    //T
-    BitSet(1,0x05);
-    BitSet(1,0x04);
-
-    //set pos to 42
-    BitSet(0,0x0C);
-    BitSet(0,0x02);
 
     //=
     BitSet(1,0x03);
     BitSet(1,0x0D);
 
-    //set pos to 47
-    BitSet(0,0x0C);
-    BitSet(0,0x07);
+    //set pos to 08
+    BitSet(0,0x08);
+    BitSet(0,0x08);
+
+    //A
+    BitSet(1,0x04);
+    BitSet(1,0x01);
+
+    //:
+    BitSet(1,0x03);
+    BitSet(1,0x0A);
+
+    //set pos to 0E
+    BitSet(0,0x08);
+    BitSet(0,0x0E);
 
     //degree
     BitSet(1,0x0D);
     BitSet(1,0x0F);
 
-    //K
+    //C
     BitSet(1,0x04);
-    BitSet(1,0x0B);
+    BitSet(1,0x03);
+
+    //M
+    BitSet(1,0x04);
+    BitSet(1,0x0D);
+
+    //:
+    BitSet(1,0x03);
+    BitSet(1,0x0A);
+
+    //set pos to 48
+    BitSet(0,0x0C);
+    BitSet(0,0x08);
+
+    //P
+    BitSet(1,0x05);
+    BitSet(1,0x00);
+
+    //:
+    BitSet(1,0x03);
+    BitSet(1,0x0A);
 
     //set pos to 4E
     BitSet(0,0x0C);
@@ -171,61 +171,11 @@ void LcdTempInit(void){
 
 //ROWS AND COLUMNS ------------------------------------------------------------
 
-void Column2(){
-    BitSet(1,0x02);
-}
-
 void Column3(){
     BitSet(1,0x03);
 }
 
-void Column4(){
-    BitSet(1,0x04);
-}
 
-void Row0(){
-    BitSet(1,0x00);
-}
-
-void Row1(){
-    BitSet(1,0x01);
-}
-
-void Row2(){
-    BitSet(1,0x02);
-}
-
-void Row3(){
-    BitSet(1,0x03);
-}
-
-void Row4(){
-    BitSet(1,0x04);
-}
-
-void Row5(){
-    BitSet(1,0x05);
-}
-
-void Row6(){
-    BitSet(1,0x06);
-}
-
-void Row7(){
-    BitSet(1,0x07);
-}
-
-void Row8(){
-    BitSet(1,0x08);
-}
-
-void Row9(){
-    BitSet(1,0x09);
-}
-
-void Row10(){
-    BitSet(1,0x0A);
-}
 
 
 //KEYPAD --------------------------
@@ -248,40 +198,39 @@ void KeyEntered(char c) {
             Row4();
             break; */
     case '0': Column3();
-            Row0();
+            BitSet(1,0x00);
             break;
     case '1': Column3();
-            Row1();
+            BitSet(1,0x01);
             break;
     case '2': Column3();
-            Row2();
+            BitSet(1,0x02);
             break;
     case '3': Column3();
-            Row3();
+            BitSet(1,0x03);
             break;
     case '4': Column3();
-            Row4();
+            BitSet(1,0x04);
             break;
     case '5': Column3();
-            Row5();
+            BitSet(1,0x05);
             break;
-    case '6':
-            Column3();
-            Row6();
+    case '6': Column3();
+            BitSet(1,0x06);
             break;
     case '7': Column3();
-            Row7();
+            BitSet(1,0x07);
             break;
     case '8': Column3();
-            Row8();
+            BitSet(1,0x08);
             break;
     case '9': Column3();
-            Row9();
+            BitSet(1,0x09);
             break;
-    case 'A': LcdTempInit();
+    case '*': LcdTempInit();
             break;
-    default: Column4();
-            Row1();
+    default: Column3();
+            BitSet(1,0x02);
             break;
     }
 
