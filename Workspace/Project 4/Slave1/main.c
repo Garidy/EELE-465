@@ -1,26 +1,25 @@
 #include <msp430.h> 
 
 
-int Data;
+int Data = 'H';
 int prevInput;
 int i;
 
-int flag = 0;
+int flag;
 
-char count;
-char pattern1 = 127;
-char pattern2 = 24;
+char patternC;
+char patternH;
 
 void display(char pattern);
 
 int main(void)
 {
-	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
-	
+    WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
+
     UCB0CTLW0 |= UCSWRST; //RESET
 
 
-	UCB0CTLW0 |= UCMODE_3; //SELECT I2C
+    UCB0CTLW0 |= UCMODE_3; //SELECT I2C
     UCB0I2COA0 = 0x01;     //SLAVE ADDRESS
     UCB0CTLW0 &= ~UCMST;   //slave MODE
     UCB0CTLW0 &= ~UCTR;      //RECEIVE MODE
@@ -71,58 +70,47 @@ int main(void)
         int temp;
 
 
-        if(Data == 'A'){            //Pattern A
-            display(170);
-            /*
-            P1OUT |= BIT0;  //Set LED 1
-            P1OUT &= ~BIT1; //clear LED 2
-            P1OUT |= BIT4;  //Set LED 3
-            P1OUT &= ~BIT5; //clear LED 4
-            P1OUT |= BIT6;  //Set LED 5
-            P1OUT &= ~BIT7; //clear LED 6
-            P2OUT |= BIT6;  //Set LED 7
-            P2OUT &= ~BIT7; //clear LED 8
-            */
-
-        }
-        else if (Data == 'B'){     //Pattern B
+        if(Data == 'H'){            //Pattern Heating
             for(i=0; i<30000; i=i+1){}  //not 1s
             for(i=0; i<30000; i=i+1){}  //not 1s
             for(i=0; i<30000; i=i+1){}  //not 1s
 
-            if(flag){
-                count = 0;
-                flag = 0;
+
+            patternH = patternH >> 1;
+            patternH = patternH + 128;
+            display(patternH);
+
+            if(patternH & BIT0){
+                patternH = 0;
             }
-            count++;
-            display(count);
 
 
         }
-        else if (Data == 'C'){    //Pattern C
-            pattern1 = (pattern1 << 1) | (pattern1 >> (8 - 1));
-            display(pattern1);
+        else if (Data == 'C'){     //Pattern Cooling
             for(i=0; i<30000; i=i+1){}  //not 1s
             for(i=0; i<30000; i=i+1){}  //not 1s
             for(i=0; i<30000; i=i+1){}  //not 1s
 
-        }
-        else if (Data == 'D'){    //Pattern D
-            temp++;
-            if(((temp % 6) == 0)){
-                pattern2 = 24;
-            }else if(((temp % 6) == 1) || ((temp % 6) == 5)){
-                pattern2 = 36;
-            }else if(((temp % 6) == 2) || ((temp % 6) == 4)){
-                pattern2 = 66;
-            }else if(((temp % 6) == 3)){
-                pattern2 = 129;
+            patternC = patternC << 1;
+            patternC = patternC + 1;
+
+
+            display(patternC);
+
+            if(patternC & BIT7){
+                patternC = 0;
             }
-            display(pattern2);
-            for(i=0; i<15000; i=i+1){}  //not 1s
-            for(i=0; i<30000; i=i+1){}  //not 1s
+
         }else{
-            display(0);
+            for(i=0; i<30000; i=i+1){}  //not 1s
+
+            if(flag == 1){
+                display(170);//10101010
+                flag = 0;
+            }else{
+                display(85);//01010101
+                flag = 1;
+            }
         }
 
 
@@ -138,7 +126,7 @@ int main(void)
     */
 
     }
-	return 0;
+    return 0;
 }
 
 void display(char pattern){
@@ -197,11 +185,11 @@ void display(char pattern){
 #pragma vector = EUSCI_B0_VECTOR
 __interrupt void EUSCI_B0_I2C_ISR(void)
 {
-    flag = 1;
     UCB0IE &= ~UCRXIE0;
     if(UCB0RXBUF != '\0' && prevInput != UCB0RXBUF) {
         prevInput = Data;
         Data = UCB0RXBUF;
     }
+    Data = 'H';
     UCB0IE |= UCRXIE0;
 }
