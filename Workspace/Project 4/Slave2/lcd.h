@@ -15,22 +15,7 @@ void BitSet(int RS, char data);
 
 void Delay(int D);
 
-void Column1();
-void Column2();
 void Column3();
-void Column4();
-
-void Row0();
-void Row1();
-void Row2();
-void Row3();
-void Row4();
-void Row5();
-void Row6();
-void Row7();
-void Row8();
-void Row9();
-void Row10();
 
 void KeyEntered(char c);
 
