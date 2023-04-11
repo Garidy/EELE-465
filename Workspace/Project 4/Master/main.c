@@ -51,6 +51,14 @@ int main(void)
     P1SEL0 |= BIT2;
 
 
+    //ADD THIS --------------
+    P3SEL1 &= ~BIT0;   //P3.0 COOL (47)
+    P3SEL0 |= BIT0;
+
+    P3SEL1 &= ~BIT1;   //P3.1 HEAT (46)
+    P3SEL0 |= BIT1;
+    //-----------------------
+
     //Setup ADC
 
     PM5CTL0 &= ~LOCKLPM5;
@@ -449,6 +457,23 @@ void resetTempData() {
     sendData[9] = 0;
 }
 
+//ADD THIS-----------------------
+void HeatPlant() {
+    P3OUT &= ~BIT0; //Ensure Cool function disabled
+    for(i=0; i<500; i=i+1){}    //Short Delay
+    P3OUT |= BIT1; //Turn on Heat
+}
+
+void CoolPlant() {
+    P3OUT &= ~BIT1; //Ensure Heat function disabled
+    for(i=0; i<500; i=i+1){}    //Short Delay
+    P3OUT |= BIT0; //Turn on Cool
+}
+
+void PlantOff() {
+    P3OUT &= ~BIT0; //Turn both Heat and Cool Off
+    P3OUT &= ~BIT1;
+}
 
 //--------------------------------------------
 //--ISRs
