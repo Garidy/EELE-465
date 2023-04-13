@@ -11,6 +11,7 @@ unsigned int globalIndex;                   // global index to send in I2C ISR
 int readIndex = 0;
 int tempData[9];
 int average = -1.0;
+int runAmbient = 0;
 
 int n;
 
@@ -25,6 +26,7 @@ char checkKeypad(void);
 int movingAverage(unsigned int);
 void populateSendData(float, int);
 int sendToLCD(void);
+void PlantAmbient(void);
 
 
 int main(void)
@@ -134,6 +136,23 @@ int main(void)
         keypad = checkKeypad();
         keypad = 'B';
         n = 3;
+
+        if (runAmbient == 1){
+            PlantAmbient();
+        }
+
+        if (keypad == 'A'){
+            HeatPlant();
+            runAmbient = 0;
+        }else if (keypad == 'B'){
+            CoolPlant();
+            runAmbient = 0;
+        }else if (keypad == 'C'){
+            runAmbient = 1;
+        }else if (keypad == 'D'){
+            PlantOff();
+            runAmbient = 0;
+        }
 
         //if(keypad != 0x00 && keypad != prevInput){
             if(keypad == '*'){
@@ -473,6 +492,18 @@ void CoolPlant() {
 void PlantOff() {
     P3OUT &= ~BIT0; //Turn both Heat and Cool Off
     P3OUT &= ~BIT1;
+}
+
+void PlantAmbient() {
+    if (LM92tempC > (LM19tempC + 2)){
+        CoolPlant();
+    }
+    else if (LM92tempC < (LM19tempC - 2)){
+        HeatPlant();
+    }
+    else{
+        PlantOff();
+    }
 }
 
 //--------------------------------------------
