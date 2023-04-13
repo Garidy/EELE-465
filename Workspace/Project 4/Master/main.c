@@ -3,9 +3,9 @@
 // constants
 const char slaveAddrLED = 0x01;            // LED address
 const char slaveAddrLCD = 0x02;            // LCD address
-const char slaveAddrRTC = 0x0068;            // RTC address
-const char slaveAddrLM92 = 0x0048;           // LM92 address
-const int sendDataLength = 13;               // length of the sendData array
+const char slaveAddrRTC = 0x068;            // RTC address
+const char slaveAddrLM92 = 0x048;           // LM92 address
+const int sendDataLength = 12;               // length of the sendData array
 const int refreshSeconds = 2;                // LCD refresh rate in seconds
 
 
@@ -166,7 +166,7 @@ int main(void) {
 
     // testing loop here
     while(1) {
-
+        int i;
 
         int currentTimeSeconds = getRTCseconds();
 
@@ -222,14 +222,27 @@ int main(void) {
                 delay(10);
 
             }
-            else if(keypad == '*' || keypad == '#') {}  // do nothing
+            else if(keypad == '*') {
+                UCB0I2CSA = slaveAddrLCD;                               // slave address to 0x12 (LED slave address)
+                sendChar = 'A';                                      // `LEDout` will be sent to LED
+                UCB0CTLW0 |= UCTR;                                      // Put into Tx mode
+                UCB0TBCNT = 0x01;                                       // Send 1 byte of data at a time
+                UCB0CTLW0 |= UCTXSTT;                                   // Generate START, triggers ISR right after
+
+                for(i=0; i<100; i=i+1){}
+
+
+            }
+
+            else if(keypad == '#') {}  // do nothing
 
             else {                                      // if a number was pressed
                 keypadInt = _toInt(keypad);             // update global variable to newest keypad press
             }
 
-            LM92tempC = 19.5;
-            LM19tempC = 29.5;
+            LM92tempC = 22.2;
+            LM19tempC = 33.3;
+            currentTimeSeconds = 444;
 
 
             populateSendData(keypadInt, LM19tempC, LM92tempC, currentTimeSeconds);          // populate sendData array for I2C transmission
@@ -251,13 +264,14 @@ int main(void) {
  * Will send the value in `LEDout` (determined in `LEDpattern()`)
  */
 void sendToLED() {
+    int i;
 
     UCB0I2CSA = slaveAddrLED;                               // slave address to 0x12 (LED slave address)
     sendChar = keypadChar;                                      // `LEDout` will be sent to LED
     UCB0CTLW0 |= UCTR;                                      // Put into Tx mode
     UCB0TBCNT = 0x01;                                       // Send 1 byte of data at a time
     UCB0CTLW0 |= UCTXSTT;                                   // Generate START, triggers ISR right after
-    //while((UCB0IFG & UCSTPIFG) == 0) {}                     // Wait for START, S.Addr, & S.ACK (Reg UCB0IFG contains UCSTPIFG bit)
+    for(i=0; i<100; i=i+1){}
     UCB0IFG &= ~UCSTPIFG;
 
 }
@@ -346,21 +360,22 @@ void LEDpattern() {
  * Example array: [ '5', '13.4',  'A', '290', '29.1']
  * -> ['5', '1', '3', '.', '4', 'A', '2', '9', '0', '2', '9', '.', '1']
  */
+
+// ['%', 'N', 'A','A','A', 'M', 'T','T','T', 'P','P','P']
+//  0     1    2   3   4    5    6   7   8    9  10  11
+// ['%', '9', '2','1','5', 'A', '0','2','4', '2','5','0']
 void populateSendData(int kInt, float tempLM19, float tempLM92, int RTCseconds) {
     int index;
 
     // position 0
-    sendData[0] = _toChar(kInt);
+    sendData[0] = '%';
+    sendData[1] = _toChar(kInt);
 
-    // from position 1 -> 4
+    // from position 2 -> 4
     float fullValueFloat = tempLM19 * 10;
     int fullValue = (int) fullValueFloat;                               // since a decimal number, make it a full number: 13.5 -> 135
-    for(index = 4; index > 0; index--) {
-        if(index == 3) {                                        // if third iteration, add decimal point '.'
-            sendData[index] = '.';
-            continue;
-        }
 
+    for(index = 4; index > 1; index--) {
         int integerValue = (int) fullValue % 10;                // mod `fullValue` and cast to integer 135 % 10 = (int) 5
         char charValue = _toChar(integerValue);                 // convert new `integerValue` to char 5 -> '5'
         sendData[index] = charValue;                            // add charValue into sendData array
@@ -379,14 +394,10 @@ void populateSendData(int kInt, float tempLM19, float tempLM92, int RTCseconds) 
         RTCseconds /= 10;                                        // divide down number
     }
 
-    // from position 9 -> 12
+    // from position 9 -> 11
     fullValueFloat = tempLM92 * 10;
     fullValue = (int) fullValueFloat;
-    for(index = 12; index > 8; index--) {
-        if(index == 11) {                                        // if third iteration, add decimal point '.'
-            sendData[index] = '.';
-            continue;
-        }
+    for(index = 11; index > 8; index--) {
 
         int integerValue = (int) fullValue % 10;                // mod `fullValue` and cast to integer 135 % 10 = (int) 5
         char charValue = _toChar(integerValue);                 // convert new `integerValue` to char 5 -> '5'
@@ -402,17 +413,21 @@ void populateSendData(int kInt, float tempLM19, float tempLM92, int RTCseconds) 
  * refresh = 'y' -> send refresh bit to LCD
  */
 void sendToLCD(char refresh) {
-
+    int i;
+    /*
     if(refresh == 'y') {
         UCB0I2CSA = slaveAddrLCD;                               // slave address to 0x14 (LCD slave address)
         sendChar = '5';                                         // '*' will be sent to LCD
         UCB0CTLW0 |= UCTR;                                      // Put into Tx mode
         UCB0TBCNT = 0x01;                                       // Send 1 byte of data at a time
         UCB0CTLW0 |= UCTXSTT;                                   // Generate START, triggers ISR right after
-        while((UCB0IFG & UCSTPIFG) == 0) {}                     // Wait for START, S.Addr, & S.ACK (Reg UCB0IFG contains UCSTPIFG bit)
+        for(i=0; i<100; i=i+1){}
+
+        //while((UCB0IFG & UCSTPIFG) == 0) {}                     // Wait for START, S.Addr, & S.ACK (Reg UCB0IFG contains UCSTPIFG bit)
         UCB0IFG &= ~UCSTPIFG;
         return;
     }
+    */
 
     isLCDdata = 0;                                              // enable LCD data transmission
 
@@ -422,8 +437,9 @@ void sendToLCD(char refresh) {
         UCB0TBCNT = 0x01;                                       // Send 1 byte of data at a time
         UCB0CTLW0 |= UCTXSTT;                                   // Generate START, triggers ISR right after
 
+        for(i=0; i<100; i=i+1){}
 
-        while((UCB0IFG & UCSTPIFG) == 0) {}                     // Wait for START, S.Addr, & S.ACK (Reg UCB0IFG contains UCSTPIFG bit)
+        //while((UCB0IFG & UCSTPIFG) == 0) {}                     // Wait for START, S.Addr, & S.ACK (Reg UCB0IFG contains UCSTPIFG bit)
         UCB0IFG &= ~UCSTPIFG;                                   // Clear flag
     }
 
@@ -472,13 +488,15 @@ void getTempFromLM92() {
  * Flag gets toggled in `ISR_TB0_CCR0()` ISR
  */
 void getTimeFromRTC() {
-
+     int i;
      // Request time in [ss/mm] format
      UCB0I2CSA = slaveAddrRTC;                  // Set Slave Address
      UCB0CTLW0 |= UCTR;                         // Put into Tx mode
      UCB0TBCNT = 0x01;                          // Send 1 byte of data at a time
      sendChar = 0x00;                           // send RTC register to start the read from
      UCB0CTLW0 |= UCTXSTT;                      // Generate START
+
+     for(i=0; i<100; i=i+1){}
 
      //while((UCB0IFG & UCSTPIFG) == 0) {}        // Wait for START, S.Addr, & S.ACK (Reg UCB0IFG contains UCSTPIFG bit)
      UCB0IFG &= ~UCSTPIFG;                      // Clear flag
@@ -489,6 +507,8 @@ void getTimeFromRTC() {
      UCB0CTLW0 &= ~UCTR;                        // Put into Rx mode
      UCB0TBCNT = 0x02;                          // Receive 2 bytes of data at a time
      UCB0CTLW0 |= UCTXSTT;                      // Generate START
+
+     for(i=0; i<100; i=i+1){}
 
      //while((UCB0IFG & UCSTPIFG) == 0) {}
      UCB0IFG &= ~UCSTPIFG;                      // Clear flag

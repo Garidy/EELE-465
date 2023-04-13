@@ -1,10 +1,10 @@
 ******************************************************************************
                   MSP430 Linker PC v21.6.1                     
 ******************************************************************************
->> Linked Thu Apr 13 11:49:51 2023
+>> Linked Thu Apr 13 12:48:13 2023
 
 OUTPUT FILE NAME:   <Project4_Master.out>
-ENTRY POINT SYMBOL: "_c_int00_noargs_mpu"  address: 00009d72
+ENTRY POINT SYMBOL: "_c_int00_noargs_mpu"  address: 00009d90
 
 
 MEMORY CONFIGURATION
@@ -16,8 +16,8 @@ MEMORY CONFIGURATION
   INFO                  00001800   00000200  00000000  00000200  RWIX
   TLVMEM                00001a00   00000200  00000000  00000200  RWIX
   BOOTCODE              00001c00   00000400  00000000  00000400  RWIX
-  RAM                   00002000   00001000  000000f7  00000f09  RWIX
-  FRAM                  00008000   00007f80  00001d9a  000061e6  RWIX
+  RAM                   00002000   00001000  000000f5  00000f0b  RWIX
+  FRAM                  00008000   00007f80  00001db8  000061c8  RWIX
   JTAGSIGNATURE         0000ff80   00000004  00000004  00000000  RWIX  ffff 
   BSLSIGNATURE          0000ff84   00000004  00000004  00000000  RWIX  ffff 
   BSLCONFIGURATIONSIGNA 0000ff88   00000002  00000002  00000000  RWIX  ffff 
@@ -108,76 +108,76 @@ section   page    origin      length       input sections
 
 .const     0    00008036    00000000     UNINITIALIZED
 
-.text      0    00008036    00001c38     
+.text      0    00008036    00001c56     
                   00008036    0000072a     rts430x_lc_sd_eabi.lib : addd.c.obj (.text:__mspabi_addd)
                   00008760    00000292                            : mpyd.c.obj (.text:__mspabi_mpyd)
-                  000089f2    00000232     main.obj (.text:main)
-                  00008c24    00000164     rts430x_lc_sd_eabi.lib : frcmpyd.c.obj (.text:__TI_frcmpyd)
-                  00008d88    00000132                            : fs_add.asm.obj (.text)
-                  00008eba    0000011a     main.obj (.text:checkKeypad)
-                  00008fd4    000000ee     rts430x_lc_sd_eabi.lib : copy_decompress_lzss.c.obj (.text:decompress:lzss:__TI_decompress_lzss)
-                  000090c2    000000ee     main.obj (.text:populateSendData)
-                  000091b0    000000b8     main.obj (.text:_getCharacter)
-                  00009268    000000b8     rts430x_lc_sd_eabi.lib : fs_mpy.asm.obj (.text)
-                  00009320    000000b6     main.obj (.text:movingAverage)
-                  000093d6    000000b2     rts430x_lc_sd_eabi.lib : cvtdf.c.obj (.text:__mspabi_cvtdf)
-                  00009488    00000090                            : fs_div.asm.obj (.text)
-                  00009518    00000074     main.obj (.text:getRTCseconds)
-                  0000958c    00000072     main.obj (.text:_hexToChar)
-                  000095fe    0000006a     rts430x_lc_sd_eabi.lib : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit_hold_wdt:__TI_auto_init_nobinit_nopinit_hold_wdt)
-                  00009668    00000068                            : fs_toi.asm.obj (.text)
-                  000096d0    00000068     main.obj (.text:sendToLCD)
-                  00009738    00000064     rts430x_lc_sd_eabi.lib : cvtfd.c.obj (.text:__mspabi_cvtfd)
-                  0000979c    0000005c                            : mult64_f5hw.asm.obj (.text:__mpyll)
+                  000089f2    00000256     main.obj (.text:main)
+                  00008c48    00000164     rts430x_lc_sd_eabi.lib : frcmpyd.c.obj (.text:__TI_frcmpyd)
+                  00008dac    00000132                            : fs_add.asm.obj (.text)
+                  00008ede    0000011a     main.obj (.text:checkKeypad)
+                  00008ff8    000000ee     rts430x_lc_sd_eabi.lib : copy_decompress_lzss.c.obj (.text:decompress:lzss:__TI_decompress_lzss)
+                  000090e6    000000d8     main.obj (.text:populateSendData)
+                  000091be    000000b8     main.obj (.text:_getCharacter)
+                  00009276    000000b8     rts430x_lc_sd_eabi.lib : fs_mpy.asm.obj (.text)
+                  0000932e    000000b6     main.obj (.text:movingAverage)
+                  000093e4    000000b2     rts430x_lc_sd_eabi.lib : cvtdf.c.obj (.text:__mspabi_cvtdf)
+                  00009496    00000090                            : fs_div.asm.obj (.text)
+                  00009526    00000074     main.obj (.text:getRTCseconds)
+                  0000959a    00000072     main.obj (.text:_hexToChar)
+                  0000960c    0000006a     rts430x_lc_sd_eabi.lib : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit_hold_wdt:__TI_auto_init_nobinit_nopinit_hold_wdt)
+                  00009676    00000068                            : fs_toi.asm.obj (.text)
+                  000096de    00000064                            : cvtfd.c.obj (.text:__mspabi_cvtfd)
+                  00009742    0000005c                            : mult64_f5hw.asm.obj (.text:__mpyll)
+                  0000979e    0000005a     main.obj (.text:getTimeFromRTC)
                   000097f8    0000004c     main.obj (.text:getTempFromLM92)
                   00009844    0000004a     rts430x_lc_sd_eabi.lib : fs_cmp.asm.obj (.text)
-                  0000988e    00000046     main.obj (.text:_adcToTempC)
-                  000098d4    00000040     rts430x_lc_sd_eabi.lib : cpy_util.asm.obj (.text:__memcpy_far)
-                  00009914    00000040                            : asr64.c.obj (.text:__mspabi_srall)
-                  00009954    0000003e                            : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset:__TI_zero_init_nomemset)
-                  00009992    0000003e                            : asr32.asm.obj (.text:l_asr_const)
-                  000099d0    0000003e                            : lsl32.asm.obj (.text:l_lsl_const)
-                  00009a0e    0000003c     FRWP_INIT_LIB_CCS_msp430_large_code_small_data.lib : frwp_init.obj (.text:__mpu_init)
-                  00009a4a    0000003c     rts430x_lc_sd_eabi.lib : copy_decompress_none.c.obj (.text:decompress:none:__TI_decompress_none)
-                  00009a86    0000003a                            : lsl64.c.obj (.text:__mspabi_sllll)
-                  00009ac0    0000003a                            : lsr64.c.obj (.text:__mspabi_srlll)
-                  00009afa    0000003a     main.obj (.text:getTimeFromRTC)
-                  00009b34    00000036     rts430x_lc_sd_eabi.lib : fs_itof.asm.obj (.text)
-                  00009b6a    0000002c                            : mult3264_f5hw.asm.obj (.text:__mpyull)
-                  00009b96    0000002c                            : div16s.asm.obj (.text)
-                  00009bc2    00000024                            : fs_utof.asm.obj (.text)
-                  00009be6    0000001e     main.obj (.text:sendToLED)
-                  00009c04    00000018     rts430x_lc_sd_eabi.lib : mult16_f5hw.asm.obj (.text)
-                  00009c1c    00000016                            : div16u.asm.obj (.text)
-                  00009c32    00000012     main.obj (.text:LM92conversion)
-                  00009c44    0000000e     main.obj (.text:delay)
-                  00009c52    00000008     main.obj (.text:_toChar)
-                  00009c5a    00000008     main.obj (.text:_toInt)
-                  00009c62    00000006     rts430x_lc_sd_eabi.lib : exit.c.obj (.text:abort)
-                  00009c68    00000004                            : pre_init.c.obj (.text:_system_pre_init)
-                  00009c6c    00000002                            : startup.c.obj (.text:_system_post_cinit)
+                  0000988e    00000048     main.obj (.text:sendToLCD)
+                  000098d6    00000046     main.obj (.text:_adcToTempC)
+                  0000991c    00000040     rts430x_lc_sd_eabi.lib : cpy_util.asm.obj (.text:__memcpy_far)
+                  0000995c    00000040                            : asr64.c.obj (.text:__mspabi_srall)
+                  0000999c    0000003e                            : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset:__TI_zero_init_nomemset)
+                  000099da    0000003e                            : asr32.asm.obj (.text:l_asr_const)
+                  00009a18    0000003e                            : lsl32.asm.obj (.text:l_lsl_const)
+                  00009a56    0000003c     FRWP_INIT_LIB_CCS_msp430_large_code_small_data.lib : frwp_init.obj (.text:__mpu_init)
+                  00009a92    0000003c     rts430x_lc_sd_eabi.lib : copy_decompress_none.c.obj (.text:decompress:none:__TI_decompress_none)
+                  00009ace    0000003a                            : lsl64.c.obj (.text:__mspabi_sllll)
+                  00009b08    0000003a                            : lsr64.c.obj (.text:__mspabi_srlll)
+                  00009b42    00000036                            : fs_itof.asm.obj (.text)
+                  00009b78    0000002e     main.obj (.text:sendToLED)
+                  00009ba6    0000002c     rts430x_lc_sd_eabi.lib : mult3264_f5hw.asm.obj (.text:__mpyull)
+                  00009bd2    0000002c                            : div16s.asm.obj (.text)
+                  00009bfe    00000024                            : fs_utof.asm.obj (.text)
+                  00009c22    00000018                            : mult16_f5hw.asm.obj (.text)
+                  00009c3a    00000016                            : div16u.asm.obj (.text)
+                  00009c50    00000012     main.obj (.text:LM92conversion)
+                  00009c62    0000000e     main.obj (.text:delay)
+                  00009c70    00000008     main.obj (.text:_toChar)
+                  00009c78    00000008     main.obj (.text:_toInt)
+                  00009c80    00000006     rts430x_lc_sd_eabi.lib : exit.c.obj (.text:abort)
+                  00009c86    00000004                            : pre_init.c.obj (.text:_system_pre_init)
+                  00009c8a    00000002                            : startup.c.obj (.text:_system_post_cinit)
 
 .text:_isr 
-*          0    00009c6e    0000012c     
-                  00009c6e    00000086     main.obj (.text:_isr:EUSCI_B0_I2C_ISR)
-                  00009cf4    0000007e     main.obj (.text:_isr:ISR_TB0_CCR0)
-                  00009d72    00000020     rts430x_lc_sd_eabi.lib : boot.c.obj (.text:_isr:_c_int00_noargs_mpu)
-                  00009d92    00000008                            : isr_trap.asm.obj (.text:_isr:__TI_ISR_TRAP)
+*          0    00009c8c    0000012c     
+                  00009c8c    00000086     main.obj (.text:_isr:EUSCI_B0_I2C_ISR)
+                  00009d12    0000007e     main.obj (.text:_isr:ISR_TB0_CCR0)
+                  00009d90    00000020     rts430x_lc_sd_eabi.lib : boot.c.obj (.text:_isr:_c_int00_noargs_mpu)
+                  00009db0    00000008                            : isr_trap.asm.obj (.text:_isr:__TI_ISR_TRAP)
 
-.bss       0    00002000    0000003b     UNINITIALIZED
+.bss       0    00002000    00000039     UNINITIALIZED
                   00002000    00000012     (.common:tempDataLM19)
                   00002012    00000012     (.common:tempDataLM92)
-                  00002024    0000000e     (.common:sendData)
-                  00002032    00000002     (.common:LM92data)
-                  00002034    00000002     (.common:globalIndex)
-                  00002036    00000001     (.common:LM92dataLower)
-                  00002037    00000001     (.common:LM92dataUpper)
-                  00002038    00000001     (.common:minutes)
-                  00002039    00000001     (.common:seconds)
-                  0000203a    00000001     (.common:sendChar)
+                  00002024    0000000c     (.common:sendData)
+                  00002030    00000002     (.common:LM92data)
+                  00002032    00000002     (.common:globalIndex)
+                  00002034    00000001     (.common:LM92dataLower)
+                  00002035    00000001     (.common:LM92dataUpper)
+                  00002036    00000001     (.common:minutes)
+                  00002037    00000001     (.common:seconds)
+                  00002038    00000001     (.common:sendChar)
 
-.data      0    0000203c    0000001c     UNINITIALIZED
-                  0000203c    0000001c     main.obj (.data)
+.data      0    0000203a    0000001c     UNINITIALIZED
+                  0000203a    0000001c     main.obj (.data)
 
 .stack     0    00002f60    000000a0     UNINITIALIZED
                   00002f60    00000002     rts430x_lc_sd_eabi.lib : boot.c.obj (.stack)
@@ -289,9 +289,9 @@ MODULE SUMMARY
        Module                       code   ro data   rw data
        ------                       ----   -------   -------
     .\
-       main.obj                     2324   4         87     
+       main.obj                     2354   4         85     
     +--+----------------------------+------+---------+---------+
-       Total:                       2324   4         87     
+       Total:                       2354   4         85     
                                                             
     C:\ti\ccs1220\ccs\ccs_base\msp430\lib\FR2xx\FRWP_INIT_LIB_CCS_msp430_large_code_small_data.lib
        frwp_init.obj                60     0         0      
@@ -359,14 +359,14 @@ MODULE SUMMARY
        Stack:                       0      0         160    
        Linker Generated:            0      53        0      
     +--+----------------------------+------+---------+---------+
-       Grand Total:                 7524   103       247    
+       Grand Total:                 7554   103       245    
 
 
 LINKER GENERATED COPY TABLES
 
 __TI_cinit_table @ 00008026 records: 2, size/record: 8, table size: 16
-	.data: load addr=00008000, load size=00000013 bytes, run addr=0000203c, run size=0000001c bytes, compression=lzss
-	.bss: load addr=00008020, load size=00000006 bytes, run addr=00002000, run size=0000003b bytes, compression=zero_init
+	.data: load addr=00008000, load size=00000013 bytes, run addr=0000203a, run size=0000001c bytes, compression=lzss
+	.bss: load addr=00008020, load size=00000006 bytes, run addr=00002000, run size=00000039 bytes, compression=zero_init
 
 
 LINKER GENERATED HANDLER TABLE
@@ -459,7 +459,7 @@ address   name
 00000672  BAKMEM9                                
 00000673  BAKMEM9_H                              
 00000672  BAKMEM9_L                              
-00009c62  C$$EXIT                                
+00009c80  C$$EXIT                                
 000002ee  CAPTIOCTL                              
 000002ef  CAPTIOCTL_H                            
 000002ee  CAPTIOCTL_L                            
@@ -538,7 +538,7 @@ address   name
 00000190  CSCTL8                                 
 00000191  CSCTL8_H                               
 00000190  CSCTL8_L                               
-00009c6e  EUSCI_B0_I2C_ISR                       
+00009c8c  EUSCI_B0_I2C_ISR                       
 000001a0  FRCTL0                                 
 000001a1  FRCTL0_H                               
 000001a0  FRCTL0_L                               
@@ -566,16 +566,16 @@ address   name
 000006c0  ICCSC                                  
 000006c1  ICCSC_H                                
 000006c0  ICCSC_L                                
-00009cf4  ISR_TB0_CCR0                           
-00002044  LCDrefresh                             
-0000204c  LEDout                                 
-0000204e  LEDrefresh                             
-00002048  LM92DataCount                          
-00009c32  LM92conversion                         
-00002032  LM92data                               
-00002036  LM92dataLower                          
-00002037  LM92dataUpper                          
-00002046  LM92refresh                            
+00009d12  ISR_TB0_CCR0                           
+00002042  LCDrefresh                             
+0000204a  LEDout                                 
+0000204c  LEDrefresh                             
+00002046  LM92DataCount                          
+00009c50  LM92conversion                         
+00002030  LM92data                               
+00002034  LM92dataLower                          
+00002035  LM92dataUpper                          
+00002044  LM92refresh                            
 000004c4  MAC                                    
 000004da  MAC32H                                 
 000004db  MAC32H_H                               
@@ -1306,11 +1306,11 @@ address   name
 00008036  __TI_CINIT_Warm                        
 00008014  __TI_Handler_Table_Base                
 00008020  __TI_Handler_Table_Limit               
-00009d92  __TI_ISR_TRAP                          
-000095fe  __TI_auto_init_nobinit_nopinit_hold_wdt
-00008fd4  __TI_decompress_lzss                   
-00009a4a  __TI_decompress_none                   
-00008c24  __TI_frcmpyd                           
+00009db0  __TI_ISR_TRAP                          
+0000960c  __TI_auto_init_nobinit_nopinit_hold_wdt
+00008ff8  __TI_decompress_lzss                   
+00009a92  __TI_decompress_none                   
+00008c48  __TI_frcmpyd                           
 0000ffce  __TI_int22                             
 0000ffd0  __TI_int23                             
 0000ffd2  __TI_int24                             
@@ -1338,105 +1338,105 @@ address   name
 ffffffff  __TI_pprof_out_hndl                    
 ffffffff  __TI_prof_data_size                    
 ffffffff  __TI_prof_data_start                   
-00009954  __TI_zero_init_nomemset                
+0000999c  __TI_zero_init_nomemset                
 ffffffff  __c_args__                             
-000098d4  __memcpy_far                           
+0000991c  __memcpy_far                           
 00000001  __mpu_enable                           
-00009a0e  __mpu_init                             
+00009a56  __mpu_init                             
 00008036  __mspabi_addd                          
-00008d8e  __mspabi_addf                          
+00008db2  __mspabi_addf                          
 00009844  __mspabi_cmpf                          
-000093d6  __mspabi_cvtdf                         
-00009738  __mspabi_cvtfd                         
-00009488  __mspabi_divf                          
-00009b96  __mspabi_divi                          
-00009c1c  __mspabi_divu                          
-00009668  __mspabi_fixfi                         
-00009b34  __mspabi_fltif                         
-00009bc2  __mspabi_fltuf                         
+000093e4  __mspabi_cvtdf                         
+000096de  __mspabi_cvtfd                         
+00009496  __mspabi_divf                          
+00009bd2  __mspabi_divi                          
+00009c3a  __mspabi_divu                          
+00009676  __mspabi_fixfi                         
+00009b42  __mspabi_fltif                         
+00009bfe  __mspabi_fltuf                         
 00008760  __mspabi_mpyd                          
-00009268  __mspabi_mpyf                          
-00009c04  __mspabi_mpyi_f5hw                     
-0000979c  __mspabi_mpyll_f5hw                    
-00009b6a  __mspabi_mpyull_f5hw                   
-00009b96  __mspabi_remi                          
-00009c1c  __mspabi_remu                          
-00009a08  __mspabi_slll_1                        
-000099e4  __mspabi_slll_10                       
-000099e0  __mspabi_slll_11                       
-000099dc  __mspabi_slll_12                       
-000099d8  __mspabi_slll_13                       
-000099d4  __mspabi_slll_14                       
-000099d0  __mspabi_slll_15                       
-00009a04  __mspabi_slll_2                        
-00009a00  __mspabi_slll_3                        
-000099fc  __mspabi_slll_4                        
-000099f8  __mspabi_slll_5                        
-000099f4  __mspabi_slll_6                        
-000099f0  __mspabi_slll_7                        
-000099ec  __mspabi_slll_8                        
-000099e8  __mspabi_slll_9                        
-00009a86  __mspabi_sllll                         
-000099ca  __mspabi_sral_1                        
-000099a6  __mspabi_sral_10                       
-000099a2  __mspabi_sral_11                       
-0000999e  __mspabi_sral_12                       
-0000999a  __mspabi_sral_13                       
-00009996  __mspabi_sral_14                       
-00009992  __mspabi_sral_15                       
-000099c6  __mspabi_sral_2                        
-000099c2  __mspabi_sral_3                        
-000099be  __mspabi_sral_4                        
-000099ba  __mspabi_sral_5                        
-000099b6  __mspabi_sral_6                        
-000099b2  __mspabi_sral_7                        
-000099ae  __mspabi_sral_8                        
-000099aa  __mspabi_sral_9                        
-00009914  __mspabi_srall                         
-00009ac0  __mspabi_srlll                         
-00008d88  __mspabi_subf                          
-0000988e  _adcToTempC                            
-00009d72  _c_int00_noargs_mpu                    
-000091b0  _getCharacter                          
-0000958c  _hexToChar                             
+00009276  __mspabi_mpyf                          
+00009c22  __mspabi_mpyi_f5hw                     
+00009742  __mspabi_mpyll_f5hw                    
+00009ba6  __mspabi_mpyull_f5hw                   
+00009bd2  __mspabi_remi                          
+00009c3a  __mspabi_remu                          
+00009a50  __mspabi_slll_1                        
+00009a2c  __mspabi_slll_10                       
+00009a28  __mspabi_slll_11                       
+00009a24  __mspabi_slll_12                       
+00009a20  __mspabi_slll_13                       
+00009a1c  __mspabi_slll_14                       
+00009a18  __mspabi_slll_15                       
+00009a4c  __mspabi_slll_2                        
+00009a48  __mspabi_slll_3                        
+00009a44  __mspabi_slll_4                        
+00009a40  __mspabi_slll_5                        
+00009a3c  __mspabi_slll_6                        
+00009a38  __mspabi_slll_7                        
+00009a34  __mspabi_slll_8                        
+00009a30  __mspabi_slll_9                        
+00009ace  __mspabi_sllll                         
+00009a12  __mspabi_sral_1                        
+000099ee  __mspabi_sral_10                       
+000099ea  __mspabi_sral_11                       
+000099e6  __mspabi_sral_12                       
+000099e2  __mspabi_sral_13                       
+000099de  __mspabi_sral_14                       
+000099da  __mspabi_sral_15                       
+00009a0e  __mspabi_sral_2                        
+00009a0a  __mspabi_sral_3                        
+00009a06  __mspabi_sral_4                        
+00009a02  __mspabi_sral_5                        
+000099fe  __mspabi_sral_6                        
+000099fa  __mspabi_sral_7                        
+000099f6  __mspabi_sral_8                        
+000099f2  __mspabi_sral_9                        
+0000995c  __mspabi_srall                         
+00009b08  __mspabi_srlll                         
+00008dac  __mspabi_subf                          
+000098d6  _adcToTempC                            
+00009d90  _c_int00_noargs_mpu                    
+000091be  _getCharacter                          
+0000959a  _hexToChar                             
 0000fffe  _reset_vector                          
 00002f60  _stack                                 
-00009c6c  _system_post_cinit                     
-00009c68  _system_pre_init                       
-00009c52  _toChar                                
-00009c5a  _toInt                                 
-00009c62  abort                                  
-00008eba  checkKeypad                            
-00009c44  delay                                  
+00009c8a  _system_post_cinit                     
+00009c86  _system_pre_init                       
+00009c70  _toChar                                
+00009c78  _toInt                                 
+00009c80  abort                                  
+00008ede  checkKeypad                            
+00009c62  delay                                  
 00008000  fram_rw_start                          
 00008000  fram_rx_start                          
-00002056  getRTCdata                             
-00009518  getRTCseconds                          
+00002054  getRTCdata                             
+00009526  getRTCseconds                          
 000097f8  getTempFromLM92                        
-00009afa  getTimeFromRTC                         
-00002034  globalIndex                            
+0000979e  getTimeFromRTC                         
+00002032  globalIndex                            
 00000001  info_fram_protection                   
-00002042  isLCDdata                              
-00002052  keypadChar                             
-00002050  keypadInt                              
+00002040  isLCDdata                              
+00002050  keypadChar                             
+0000204e  keypadInt                              
 000089f2  main                                   
-00002038  minutes                                
-00009320  movingAverage                          
-0000204a  patternCount                           
-000090c2  populateSendData                       
+00002036  minutes                                
+0000932e  movingAverage                          
+00002048  patternCount                           
+000090e6  populateSendData                       
 00000001  program_fram_protection                
-0000203c  readIndexLM19                          
-0000203e  readIndexLM92                          
-00002054  rtcDataCount                           
-00002039  seconds                                
-0000203a  sendChar                               
+0000203a  readIndexLM19                          
+0000203c  readIndexLM92                          
+00002052  rtcDataCount                           
+00002037  seconds                                
+00002038  sendChar                               
 00002024  sendData                               
-000096d0  sendToLCD                              
-00009be6  sendToLED                              
+0000988e  sendToLCD                              
+00009b78  sendToLED                              
 00000000  start_protection_offset_address        
 00002000  tempDataLM19                           
 00002012  tempDataLM92                           
-00002040  timerCount                             
+0000203e  timerCount                             
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -2357,27 +2357,27 @@ address   name
 00002000  tempDataLM19                           
 00002012  tempDataLM92                           
 00002024  sendData                               
-00002032  LM92data                               
-00002034  globalIndex                            
-00002036  LM92dataLower                          
-00002037  LM92dataUpper                          
-00002038  minutes                                
-00002039  seconds                                
-0000203a  sendChar                               
-0000203c  readIndexLM19                          
-0000203e  readIndexLM92                          
-00002040  timerCount                             
-00002042  isLCDdata                              
-00002044  LCDrefresh                             
-00002046  LM92refresh                            
-00002048  LM92DataCount                          
-0000204a  patternCount                           
-0000204c  LEDout                                 
-0000204e  LEDrefresh                             
-00002050  keypadInt                              
-00002052  keypadChar                             
-00002054  rtcDataCount                           
-00002056  getRTCdata                             
+00002030  LM92data                               
+00002032  globalIndex                            
+00002034  LM92dataLower                          
+00002035  LM92dataUpper                          
+00002036  minutes                                
+00002037  seconds                                
+00002038  sendChar                               
+0000203a  readIndexLM19                          
+0000203c  readIndexLM92                          
+0000203e  timerCount                             
+00002040  isLCDdata                              
+00002042  LCDrefresh                             
+00002044  LM92refresh                            
+00002046  LM92DataCount                          
+00002048  patternCount                           
+0000204a  LEDout                                 
+0000204c  LEDrefresh                             
+0000204e  keypadInt                              
+00002050  keypadChar                             
+00002052  rtcDataCount                           
+00002054  getRTCdata                             
 00002f60  _stack                                 
 00003000  __STACK_END                            
 00008000  fram_rw_start                          
@@ -2390,86 +2390,86 @@ address   name
 00008036  __mspabi_addd                          
 00008760  __mspabi_mpyd                          
 000089f2  main                                   
-00008c24  __TI_frcmpyd                           
-00008d88  __mspabi_subf                          
-00008d8e  __mspabi_addf                          
-00008eba  checkKeypad                            
-00008fd4  __TI_decompress_lzss                   
-000090c2  populateSendData                       
-000091b0  _getCharacter                          
-00009268  __mspabi_mpyf                          
-00009320  movingAverage                          
-000093d6  __mspabi_cvtdf                         
-00009488  __mspabi_divf                          
-00009518  getRTCseconds                          
-0000958c  _hexToChar                             
-000095fe  __TI_auto_init_nobinit_nopinit_hold_wdt
-00009668  __mspabi_fixfi                         
-000096d0  sendToLCD                              
-00009738  __mspabi_cvtfd                         
-0000979c  __mspabi_mpyll_f5hw                    
+00008c48  __TI_frcmpyd                           
+00008dac  __mspabi_subf                          
+00008db2  __mspabi_addf                          
+00008ede  checkKeypad                            
+00008ff8  __TI_decompress_lzss                   
+000090e6  populateSendData                       
+000091be  _getCharacter                          
+00009276  __mspabi_mpyf                          
+0000932e  movingAverage                          
+000093e4  __mspabi_cvtdf                         
+00009496  __mspabi_divf                          
+00009526  getRTCseconds                          
+0000959a  _hexToChar                             
+0000960c  __TI_auto_init_nobinit_nopinit_hold_wdt
+00009676  __mspabi_fixfi                         
+000096de  __mspabi_cvtfd                         
+00009742  __mspabi_mpyll_f5hw                    
+0000979e  getTimeFromRTC                         
 000097f8  getTempFromLM92                        
 00009844  __mspabi_cmpf                          
-0000988e  _adcToTempC                            
-000098d4  __memcpy_far                           
-00009914  __mspabi_srall                         
-00009954  __TI_zero_init_nomemset                
-00009992  __mspabi_sral_15                       
-00009996  __mspabi_sral_14                       
-0000999a  __mspabi_sral_13                       
-0000999e  __mspabi_sral_12                       
-000099a2  __mspabi_sral_11                       
-000099a6  __mspabi_sral_10                       
-000099aa  __mspabi_sral_9                        
-000099ae  __mspabi_sral_8                        
-000099b2  __mspabi_sral_7                        
-000099b6  __mspabi_sral_6                        
-000099ba  __mspabi_sral_5                        
-000099be  __mspabi_sral_4                        
-000099c2  __mspabi_sral_3                        
-000099c6  __mspabi_sral_2                        
-000099ca  __mspabi_sral_1                        
-000099d0  __mspabi_slll_15                       
-000099d4  __mspabi_slll_14                       
-000099d8  __mspabi_slll_13                       
-000099dc  __mspabi_slll_12                       
-000099e0  __mspabi_slll_11                       
-000099e4  __mspabi_slll_10                       
-000099e8  __mspabi_slll_9                        
-000099ec  __mspabi_slll_8                        
-000099f0  __mspabi_slll_7                        
-000099f4  __mspabi_slll_6                        
-000099f8  __mspabi_slll_5                        
-000099fc  __mspabi_slll_4                        
-00009a00  __mspabi_slll_3                        
-00009a04  __mspabi_slll_2                        
-00009a08  __mspabi_slll_1                        
-00009a0e  __mpu_init                             
-00009a4a  __TI_decompress_none                   
-00009a86  __mspabi_sllll                         
-00009ac0  __mspabi_srlll                         
-00009afa  getTimeFromRTC                         
-00009b34  __mspabi_fltif                         
-00009b6a  __mspabi_mpyull_f5hw                   
-00009b96  __mspabi_divi                          
-00009b96  __mspabi_remi                          
-00009bc2  __mspabi_fltuf                         
-00009be6  sendToLED                              
-00009c04  __mspabi_mpyi_f5hw                     
-00009c1c  __mspabi_divu                          
-00009c1c  __mspabi_remu                          
-00009c32  LM92conversion                         
-00009c44  delay                                  
-00009c52  _toChar                                
-00009c5a  _toInt                                 
-00009c62  C$$EXIT                                
-00009c62  abort                                  
-00009c68  _system_pre_init                       
-00009c6c  _system_post_cinit                     
-00009c6e  EUSCI_B0_I2C_ISR                       
-00009cf4  ISR_TB0_CCR0                           
-00009d72  _c_int00_noargs_mpu                    
-00009d92  __TI_ISR_TRAP                          
+0000988e  sendToLCD                              
+000098d6  _adcToTempC                            
+0000991c  __memcpy_far                           
+0000995c  __mspabi_srall                         
+0000999c  __TI_zero_init_nomemset                
+000099da  __mspabi_sral_15                       
+000099de  __mspabi_sral_14                       
+000099e2  __mspabi_sral_13                       
+000099e6  __mspabi_sral_12                       
+000099ea  __mspabi_sral_11                       
+000099ee  __mspabi_sral_10                       
+000099f2  __mspabi_sral_9                        
+000099f6  __mspabi_sral_8                        
+000099fa  __mspabi_sral_7                        
+000099fe  __mspabi_sral_6                        
+00009a02  __mspabi_sral_5                        
+00009a06  __mspabi_sral_4                        
+00009a0a  __mspabi_sral_3                        
+00009a0e  __mspabi_sral_2                        
+00009a12  __mspabi_sral_1                        
+00009a18  __mspabi_slll_15                       
+00009a1c  __mspabi_slll_14                       
+00009a20  __mspabi_slll_13                       
+00009a24  __mspabi_slll_12                       
+00009a28  __mspabi_slll_11                       
+00009a2c  __mspabi_slll_10                       
+00009a30  __mspabi_slll_9                        
+00009a34  __mspabi_slll_8                        
+00009a38  __mspabi_slll_7                        
+00009a3c  __mspabi_slll_6                        
+00009a40  __mspabi_slll_5                        
+00009a44  __mspabi_slll_4                        
+00009a48  __mspabi_slll_3                        
+00009a4c  __mspabi_slll_2                        
+00009a50  __mspabi_slll_1                        
+00009a56  __mpu_init                             
+00009a92  __TI_decompress_none                   
+00009ace  __mspabi_sllll                         
+00009b08  __mspabi_srlll                         
+00009b42  __mspabi_fltif                         
+00009b78  sendToLED                              
+00009ba6  __mspabi_mpyull_f5hw                   
+00009bd2  __mspabi_divi                          
+00009bd2  __mspabi_remi                          
+00009bfe  __mspabi_fltuf                         
+00009c22  __mspabi_mpyi_f5hw                     
+00009c3a  __mspabi_divu                          
+00009c3a  __mspabi_remu                          
+00009c50  LM92conversion                         
+00009c62  delay                                  
+00009c70  _toChar                                
+00009c78  _toInt                                 
+00009c80  C$$EXIT                                
+00009c80  abort                                  
+00009c86  _system_pre_init                       
+00009c8a  _system_post_cinit                     
+00009c8c  EUSCI_B0_I2C_ISR                       
+00009d12  ISR_TB0_CCR0                           
+00009d90  _c_int00_noargs_mpu                    
+00009db0  __TI_ISR_TRAP                          
 0000ffce  __TI_int22                             
 0000ffd0  __TI_int23                             
 0000ffd2  __TI_int24                             
