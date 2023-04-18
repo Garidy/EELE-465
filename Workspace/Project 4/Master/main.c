@@ -459,11 +459,12 @@ float LM92conversion(int LM92dataFromI2C){
  * Get's current temp value from LM92
  */
 void getTempFromLM92() {
-
+    int i;
     UCB0I2CSA = slaveAddrLM92;                 // Set Slave Address to LM92 -> 0x0048
     UCB0CTLW0 &= ~UCTR;                        // Put into Rx mode
     UCB0TBCNT = 0x02;                          // Send 1 byte of data at a time
     UCB0CTLW0 |= UCTXSTT;                      // Generate START
+    for(i=0; i<100; i=i+1){}
 
    // while((UCB0IFG & UCSTPIFG) == 0) {}        // wait for stop condition
     UCB0IFG &= ~UCSTPIFG;                      // Clear flag
@@ -845,7 +846,7 @@ __interrupt void EUSCI_B0_I2C_ISR(void) {
                 }
                 else if(LM92DataCount == 1) {
                     LM92dataLower = UCB0RXBUF;
-                    LM92DataCount = 0;
+                     LM92DataCount = 0;
                 }
             }
 
