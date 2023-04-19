@@ -206,16 +206,34 @@ int main(void) {
                 keypadChar = keypad;
 
                 if(keypadChar == 'A') {                 // start heating
-                    P5OUT |= BIT1;
-                    P5OUT &= ~BIT2;
+                    P3OUT &= ~BIT0;
+                    delay(10);
+                    P3OUT |= BIT1;
                 }
                 else if(keypadChar == 'B') {            // start cooling
-                    P5OUT &= ~BIT1;
-                    P5OUT |= BIT2;
+                    P3OUT &= ~BIT1;
+                    delay(10);
+                    P3OUT |= BIT0;
+                }
+                else if(keypadChar == 'C'){
+                    if (LM92tempC > (LM19tempC + 2)){   // if plant > ambient + 2, then cool
+                        P3OUT &= ~BIT1;
+                        delay(10);
+                        P3OUT |= BIT0;
+                    }
+                    else if (LM92tempC < (LM19tempC - 2)){   // if plant < ambient - 2, then heat
+                        P3OUT &= ~BIT0;
+                        delay(10);
+                        P3OUT |= BIT1;
+                    }
+                    else {          // else turn off plant
+                        P3OUT &= ~BIT1;
+                        P3OUT &= ~BIT0;
+                    }
                 }
                 else if(keypadChar == 'D') {            // turn off fan
-                    P5OUT &= ~BIT1;
-                    P5OUT &= ~BIT2;
+                    P3OUT &= ~BIT1;
+                    P3OUT &= ~BIT0;
                 }
 
                 sendToLED();
